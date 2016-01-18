@@ -1,0 +1,12 @@
+#@IgnoreInspection BashAddShebang
+
+DOCKER_ACCOUNT="ezsystems"
+
+function generateDockerTag
+{
+    if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+        IMAGE_TAG="php:${TRAVIS_BRANCH}"
+    fi
+    echo "IMAGE_TAG=$IMAGE_TAG"
+}
+
