@@ -16,6 +16,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     COMPOSER_HOME=/home/ez/.composer
 
 ## Get packages
+### unzip needed due to https://github.com/composer/composer/issues/4471
 RUN apt-get update -q -y \
  && apt-get install -q -y --force-yes --no-install-recommends \
         libfreetype6-dev \
@@ -34,6 +35,7 @@ RUN apt-get update -q -y \
         acl \
         sudo \
         tree \
+        unzip \
         && rm -rf /var/lib/apt/lists/*
 
 # Install and configure php plugins
