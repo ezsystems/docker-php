@@ -79,6 +79,8 @@ ADD generate_kickstart_file.sh /generate_kickstart_file.sh
 ADD generate_parameters_file.sh /generate_parameters_file.sh
 ADD prepare_distribution_volume.sh /prepare_distribution_volume.sh
 ADD prepare_behat.sh /prepare_behat.sh
+ADD default_mysql_settings.sh /default_mysql_settings.sh
+ADD wait_for_db.sh /wait_for_db.sh
 
 #/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 #ADD config/opcache.ini /usr/local/php7/etc/conf.d/opcache.ini

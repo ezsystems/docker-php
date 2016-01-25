@@ -17,28 +17,7 @@ if [ -d ezpublish ]; then
     APP_FOLDER="ezpublish"
 fi
 
-if [ "$MYSQL_HOST" == "" ]; then
-    MYSQL_HOST="db"
-fi
-
-if [ "$MYSQL_PORT" == "" ]; then
-    if [ "$DB_PORT_3306_TCP_PORT" == "" ]; then
-        DB_PORT_3306_TCP_PORT=3306
-    fi
-    MYSQL_PORT="$DB_PORT_3306_TCP_PORT"
-fi
-
-if [ "$MYSQL_DATABASE" == "" ]; then
-    MYSQL_DATABASE="ezp"
-fi
-
-if [ "$MYSQL_USER" == "" ]; then
-    MYSQL_USER="ezp"
-fi
-
-if [ "$MYSQL_PASSWORD" == "" ]; then
-    MYSQL_PASSWORD="ezp"
-fi
+source /default_mysql_settings.sh
 
 sed -i "s@secret:.*@secret: $SECRET@" $APP_FOLDER/config/parameters.yml
 sed -i "s@database_driver:.*@database_driver: pdo_mysql@" $APP_FOLDER/config/parameters.yml
