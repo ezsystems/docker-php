@@ -105,6 +105,7 @@ function warm_cache
 }
 
 prevent_multiple_execuition
+getIndexScript
 set_splash_screen "Initializing"
 set_permissions
 set_splash_screen "Waiting for db connection"
