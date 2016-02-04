@@ -6,9 +6,7 @@ services:
   - docker
 
 install:
-  - bin/.travis/install.sh
+  - bin/.travis/build.sh
 
 script: bin/.travis/test.sh
 
-after_success:
-  - bin/.travis/after_success.sh
