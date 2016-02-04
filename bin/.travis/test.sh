@@ -5,6 +5,15 @@ set -e
 SCRIPT_DIR=$(dirname $0)
 source $SCRIPT_DIR/functions
 
+function createVolumeDirectory
+{
+    if [ -d volumes/ezplatform ]; then
+        sudo rm -Rf volumes/ezplatform
+    fi
+    mkdir -p volumes/ezplatform
+    sudo chown 10000:10000 volumes/ezplatform
+}
+
 function dockerPush
 {
     # We'll only push to docker hub if we are processing a tag
@@ -20,6 +29,7 @@ function dockerPush
 }
 
 generateDockerTag
+createVolumeDirectory
 
 docker run -ti --rm --user=ez \
   -v $(pwd)/volumes/ezplatform:/var/www \

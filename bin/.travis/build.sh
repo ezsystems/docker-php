@@ -37,14 +37,7 @@ function dockerBuild
     docker build --rm=true --pull -t ${IMAGE_ORGANIZATION}/${IMAGE_TAG} ezphp
 }
 
-function createVolumeDirectory
-{
-    mkdir -p volumes/ezplatform
-    sudo chown 10000:10000 volumes/ezplatform
-}
-
 validateEnvironment
 generateDockerTag
 dockerBuild
-createVolumeDirectory
 
