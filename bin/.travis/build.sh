@@ -24,15 +24,17 @@ function validateEnvironment
         echo "Environment variable TRAVIS_BRANCH is not set. Bailling out !"
         exit 1
     fi
-    if [ "$TRAVIS_PULL_REQUEST" == "" ]; then
-        echo "Environment variable TRAVIS_PULL_REQUEST is not set. Bailling out !"
+    # Docker image name is constructed like this : $IMAGE_ORGANIZATION/php:${TRAVIS_BRANCH|TRAVIS_TAG}. Example : ezsystems/php:7.0
+    if [ "$IMAGE_ORGANIZATION" == "" ]; then
+        echo "Environment variable IMAGE_ORGANIZATION is not set. Bailling out !"
         exit 1
     fi
+
 }
 
 function dockerBuild
 {
-    docker build --rm=true --pull -t ${DOCKER_ACCOUNT}/${IMAGE_TAG} ezphp
+    docker build --rm=true --pull -t ${IMAGE_ORGANIZATION}/${IMAGE_TAG} ezphp
 }
 
 function createVolumeDirectory
