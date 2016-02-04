@@ -34,7 +34,7 @@ function validateEnvironment
 
 function dockerBuild
 {
-    docker build --rm=true --pull -t ${IMAGE_ORGANIZATION}/${IMAGE_TAG} ezphp
+    docker build --rm=true --pull -t ${IMAGE_ORGANIZATION}/${IMAGE_TAG} php
 }
 
 validateEnvironment
