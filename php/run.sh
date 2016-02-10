@@ -52,9 +52,6 @@ if [ "$EZ_KICKSTART" = "true" ]; then
   /generate_kickstart_file.sh $EZ_KICKSTART_FROM_TEMPLATE
 fi
 
-/generate_parameters_file.sh
-
-
 echo "Setting permissions on eZ Publish folder as they might be broken if rsync is used"
 if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" == "false" ]; then
     sudo -u ez mkdir web/var
@@ -77,9 +74,6 @@ APP_FOLDER="app"
 if [ -d ezpublish ]; then
     APP_FOLDER="ezpublish"
 fi
-
-echo "Clear cache after parameters where updated"
-sudo -u ez php $APP_FOLDER/console cache:clear --env $EZ_ENVIRONMENT
 
 if [ "$EZ_ENVIRONMENT" != "dev" ]; then
     echo "Re-generate symlink assets in case rsync was used so asstets added during setup wizards are reachable"
