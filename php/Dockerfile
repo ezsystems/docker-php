@@ -66,7 +66,7 @@ RUN sed -i "s@^listen = 127.0.0.1:9000@listen = $PORT@" /usr/local/etc/php-fpm.d
  && sed -i "s@^user = nobody@user = www-data@" /usr/local/etc/php-fpm.d/www.conf.default \
  && sed -i "s@^group = nobody@group = www-data@" /usr/local/etc/php-fpm.d/www.conf.default
 
-RUN groupadd -g 10000 ez && useradd -g ez -u 10000 ez --create-home
+RUN groupadd -g 10000 ez && useradd -g ez -G www-data -u 10000 ez --create-home && echo "umask 0002" >> /etc/bash.bashrc
 # Create Composer directory (cache and auth files)
 RUN mkdir -p $COMPOSER_HOME && chown ez:ez $COMPOSER_HOME
 
@@ -80,6 +80,7 @@ ADD prepare_distribution_volume.sh /prepare_distribution_volume.sh
 ADD prepare_behat.sh /prepare_behat.sh
 ADD default_mysql_settings.sh /default_mysql_settings.sh
 ADD wait_for_db.sh /wait_for_db.sh
+ADD set_permissions.sh /set_permissions.sh
 
 #/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
 #ADD config/opcache.ini /usr/local/php7/etc/conf.d/opcache.ini

@@ -57,19 +57,6 @@ if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" == "false" ]; then
     sudo -u ez mkdir web/var
 fi
 
-if [ -d ezpublish ]; then
-    setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/{cache,logs,sessions}${VARDIR}
-    setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/{cache,logs,sessions}${VARDIR}
-else
-    setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX app/{cache,logs}${VARDIR}
-    setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX app/{cache,logs}${VARDIR}
-fi
-
-if [ -d ezpublish_legacy ]; then
-    setfacl -R -m u:$APACHE_RUN_USER:rwx -m u:ez:rwx ezpublish_legacy/{design,extension,settings,var} ezpublish/config web
-    setfacl -dR -m u:$APACHE_RUN_USER:rwx -m u:ez:rwx ezpublish_legacy/{design,extension,settings,var} ezpublish/config web
-fi
-
 APP_FOLDER="app"
 if [ -d ezpublish ]; then
     APP_FOLDER="ezpublish"
@@ -85,6 +72,8 @@ sudo -u ez php $APP_FOLDER/console assets:install --symlink --relative --env $EZ
 if [ -d ezpublish_legacy ]; then
     sudo -u ez php $APP_FOLDER/console ezpublish:legacy:assets_install --symlink --relative --env $EZ_ENVIRONMENT
 fi
+
+umask 0002
 
 # Start php-fpm
 if [ -x /usr/local/sbin/php-fpm ]; then
