@@ -38,30 +38,6 @@ function remove_splash_screen
     sudo -u ez mv ${INDEX_SCRIPT}.org ${INDEX_SCRIPT}
 }
 
-function set_permissions
-{
-    if [ "aa$APACHE_RUN_USER" == "aa" ]; then
-        APACHE_RUN_USER=www-data
-    fi
-
-    if [ ! -d web/var ]; then
-        sudo -u ez mkdir web/var
-    fi
-
-    if [ -d ezpublish ]; then
-        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/{cache,logs,sessions} web/var
-        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/{cache,logs,sessions} web/var
-    else
-        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX app/{cache,logs} web/var
-        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX app/{cache,logs} web/var
-    fi
-
-    if [ -d ezpublish_legacy ]; then
-        setfacl -R -m u:$APACHE_RUN_USER:rwx -m u:ez:rwx ezpublish_legacy/{design,extension,settings,var} ezpublish/config web
-        setfacl -dR -m u:$APACHE_RUN_USER:rwx -m u:ez:rwx ezpublish_legacy/{design,extension,settings,var} ezpublish/config web
-    fi
-}
-
 function import_database
 {
     local DBUP
@@ -106,8 +82,6 @@ function warm_cache
 
 prevent_multiple_execuition
 getIndexScript
-set_splash_screen "Initializing"
-set_permissions
 set_splash_screen "Waiting for db connection"
 import_database
 
