@@ -1,0 +1,12 @@
+sudo: required
+
+language: php
+
+services:
+  - docker
+
+install:
+  - bin/.travis/build.sh
+
+script: bin/.travis/test.sh
+
