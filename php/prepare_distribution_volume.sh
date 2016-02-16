@@ -28,14 +28,14 @@ function getIndexScript
 function set_splash_screen
 {
     if [ ! -f "${INDEX_SCRIPT}.org" ]; then
-        sudo -u ez mv ${INDEX_SCRIPT} ${INDEX_SCRIPT}.org
+        mv ${INDEX_SCRIPT} ${INDEX_SCRIPT}.org
     fi
-    sudo -u ez echo "<html><body>$1</body></html>" > ${INDEX_SCRIPT}
+    echo "<html><body>$1</body></html>" > ${INDEX_SCRIPT}
 }
 
 function remove_splash_screen
 {
-    sudo -u ez mv ${INDEX_SCRIPT}.org ${INDEX_SCRIPT}
+    mv ${INDEX_SCRIPT}.org ${INDEX_SCRIPT}
 }
 
 function import_database
@@ -64,7 +64,7 @@ function import_database
         let TRY=$TRY+1
         if [ $TRY -eq $MAXTRY ]; then
             echo Max limit reached. Not able to connect to mysql
-            sudo -u ez rm /tmp/prepare_distribution_already_run.txt
+            rm /tmp/prepare_distribution_already_run.txt
             exit 1;
         fi
         sleep 5;
