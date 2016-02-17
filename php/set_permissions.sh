@@ -117,19 +117,35 @@ function set_permissions_prod
 
 function set_permissions_www_data
 {
+    local APP_FOLDER
+    APP_FOLDER="app"
+
+    # eZ Publish 5.4 stuff
+    if [ -d ezpublish ]; then
+        APP_FOLDER="ezpublish"
+    fi
+
+    # You might set SKIP_INITIALIZING_VAR=true if you would like to setup web/var from outside this container
+    if [ "$SKIP_INITIALIZING_VAR" == "true" ]; then
+        VARDIR=""
+    else
+        SKIP_INITIALIZING_VAR="false"
+        VARDIR="web/var"
+    fi
+
     if [ ! -d web/var ]; then
         mkdir web/var
     fi
 
-    if [ -d ezpublish ]; then
-        find {ezpublish/{cache,logs,sessions},web/var} -type d | xargs --no-run-if-empty chmod -R 2775
-        find {ezpublish/{cache,logs,sessions},web/var} -type f | xargs --no-run-if-empty chmod -R 664
-        chown :$APACHE_RUN_USER -R {ezpublish/{cache,logs,sessions},web/var}
-    else
-        find {app/{cache,logs},web/var} -type d | xargs --no-run-if-empty chmod -R 2775
-        find {app/{cache,logs},web/var} -type f | xargs --no-run-if-empty chmod -R 664
-        chown :$APACHE_RUN_USER -R {app/{cache,logs},web/var}
+    # eZ Publish 5.4 stuff
+    if [ -d ezpublish/sessions ]; then
+        find ezpublish/sessions -type d | xargs --no-run-if-empty chmod -R 2775
+        find ezpublish/sessions -type f | xargs --no-run-if-empty chmod -R 664
+        chown :$APACHE_RUN_USER -R ezpublish/sessions
     fi
+    find ${APP_FOLDER}/{cache,logs} ${VARDIR} -type d | xargs --no-run-if-empty chmod -R 2775
+    find ${APP_FOLDER}/{cache,logs} ${VARDIR} -type f | xargs --no-run-if-empty chmod -R 664
+    chown :$APACHE_RUN_USER -R ${APP_FOLDER}/{cache,logs} ${VARDIR}
 
 
     if [ -d ezpublish_legacy ]; then
