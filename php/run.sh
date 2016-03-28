@@ -27,7 +27,7 @@ function parseCommandlineOptions
         VARDIR=""
     else
         SKIP_INITIALIZING_VAR="false"
-        VARDIR=" web/var"
+        VARDIR=" web"
     fi
 }
 
