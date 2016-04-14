@@ -2,45 +2,31 @@
 
 set -e
 
-SCRIPT_DIR=$(dirname $0)
-source $SCRIPT_DIR/functions
+if [ "$1" == "" ]; then
+    echo "Argument 1 for image tag missing. Bailling out !"
+    exit 1
+fi
 
-function createVolumeDirectory
-{
-    if [ -d volumes/ezplatform ]; then
-        sudo rm -Rf volumes/ezplatform
-    fi
-    mkdir -p volumes/ezplatform
-    sudo chown 10000:10000 volumes/ezplatform
-}
+IMAGE_TAG="$1"
 
-function dockerPush
-{
-    # We'll only push to docker hub if we are processing a tag
-    if [ "$TRAVIS_TAG" != "" ]; then
-        docker images
-        docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-        echo Pushing docker image : ${IMAGE_ORGANIZATION}/${IMAGE_TAG}
-        docker push ${IMAGE_ORGANIZATION}/${IMAGE_TAG}
-        echo "Pushing image ${IMAGE_ORGANIZATION}/${IMAGE_TAG} succeeded"
-    else
-        echo "Not processing a git tag, skipped push to docker hub"
-    fi
-}
+if [ -d volumes/ezplatform ]; then
+    sudo rm -Rf volumes/ezplatform
+fi
 
-generateDockerTag
-createVolumeDirectory
+mkdir -p volumes/ezplatform
+sudo chown 10000:10000 volumes/ezplatform
 
 docker run -ti --rm --user=ez \
   -v $(pwd)/volumes/ezplatform:/var/www \
-  -v $(pwd)/bin/.travis/composer-auth.json:/home/ez/.composer/auth.json \
-  ${IMAGE_ORGANIZATION}/${IMAGE_TAG} \
-  bash -c "composer create-project --no-dev --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www dev-master"
+  ${IMAGE_TAG} \
+  bash -c "composer config -g github-oauth.github.com \"d0285ed5c8644f30547572ead2ed897431c1fc09\"; \
+           composer create-project --no-dev --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www"
 
 docker run -ti --rm --user=ez \
   -v $(pwd)/volumes/ezplatform:/var/www \
   -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
-  ${IMAGE_ORGANIZATION}/${IMAGE_TAG} \
+  ${IMAGE_TAG} \
   bash -c "php testSymfonyRequirements.php"
 
-dockerPush
+# TODO: Run behat suite with defaults? Maybe when we have verified that it works with sqlite and
+# TODO: php-internal-web-server, to avoid pulling in full docker-compose setup.
