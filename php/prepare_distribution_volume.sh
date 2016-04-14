@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Let's try to connect to db for 2 minutes ( 24 * 5 sec intervalls )
 MAXTRY=24
