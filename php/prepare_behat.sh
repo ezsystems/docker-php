@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Copy and prepare behat config if selenium is present
 if [ "$SELENIUM_PORT_4444_TCP_ADDR" != "" ]; then
