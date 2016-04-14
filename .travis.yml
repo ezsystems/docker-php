@@ -8,7 +8,7 @@ services:
 
 env:
   global:
-    - IMAGE_NAME=ezsystems/php
+    - REMOTE_IMAGE=ezsystems/php
     - LATEST="7.0"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
@@ -16,12 +16,12 @@ env:
     - PHP_VERSION="5.6"
     - PHP_VERSION="7.0"
 
-before_script: docker build --rm=true --pull -f php/Dockerfile-${PHP_VERSION}  -t ${IMAGE_NAME}:${PHP_VERSION} php
+before_script: bin/.travis/build.sh ${PHP_VERSION}
 
 # Execute both test and push under script, so job will fail on failed deployment
 script:
-  - bin/.travis/test.sh ${IMAGE_NAME}:${PHP_VERSION}
-  - if [ "$TRAVIS_TAG" != "" ]; then bin/.travis/push.sh ${IMAGE_NAME} ${PHP_VERSION} ${TRAVIS_TAG}; fi
+  - bin/.travis/test.sh
+  - if [ "$TRAVIS_TAG" != "" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${TRAVIS_TAG}; fi
 
 # test only master (+ Pull requests)
 branches:

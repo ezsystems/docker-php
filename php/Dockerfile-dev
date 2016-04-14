@@ -1,0 +1,16 @@
+FROM ez_php
+
+# Add additional packages for dev use
+RUN apt-get update -q -y \
+ && apt-get install -q -y --force-yes --no-install-recommends \
+        git \
+        less \
+        mariadb-client \
+        vim \
+        wget \
+        tree \
+        && rm -rf /var/lib/apt/lists/*
+
+# Install xdebug
+RUN yes | pecl install xdebug
+COPY config/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini
