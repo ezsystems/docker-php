@@ -1,4 +1,4 @@
-FROM php:7.0-fpm
+FROM php:5.6-fpm
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform
 #
@@ -52,7 +52,6 @@ RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive
 RUN cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
  && echo "date.timezone = $TIMEZONE" >> /usr/local/etc/php/php.ini \
  && echo "memory_limit = $MEMORY_LIMIT" >> /usr/local/etc/php/php.ini \
- && echo "realpath_cache_size = 256k" >> /usr/local/etc/php/php.ini \
  && echo "max_execution_time = $MAX_EXECUTION_TIME" >> /usr/local/etc/php/php.ini
 
 # Disable daemonizeing php-fpm
@@ -62,9 +61,9 @@ RUN cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" /usr/local/etc/php-fpm.conf
 
 # Set listen socket for php-fpm
-RUN sed -i "s@^listen = 127.0.0.1:9000@listen = $PORT@" /usr/local/etc/php-fpm.d/www.conf.default \
- && sed -i "s@^user = nobody@user = www-data@" /usr/local/etc/php-fpm.d/www.conf.default \
- && sed -i "s@^group = nobody@group = www-data@" /usr/local/etc/php-fpm.d/www.conf.default
+#RUN sed -i "s@^listen = 127.0.0.1:9000@listen = $PORT@" /usr/local/etc/php-fpm.d/www.conf.default \
+# && sed -i "s@^user = nobody@user = www-data@" /usr/local/etc/php-fpm.d/www.conf.default \
+# && sed -i "s@^group = nobody@group = www-data@" /usr/local/etc/php-fpm.d/www.conf.default
 
 RUN groupadd -g 10000 ez && useradd -g ez -G www-data -u 10000 ez --create-home && echo "umask 0002" >> /etc/bash.bashrc
 # Create Composer directory (cache and auth files)
@@ -82,8 +81,8 @@ ADD default_mysql_settings.sh /default_mysql_settings.sh
 ADD wait_for_db.sh /wait_for_db.sh
 ADD set_permissions.sh /set_permissions.sh
 
-#/usr/local/etc/php/conf.d/docker-php-ext-opcache.ini
-#ADD config/opcache.ini /usr/local/php7/etc/conf.d/opcache.ini
+# Add some custom config
+ADD config/ez-php.ini /usr/local/etc/php/conf.d/ez-php.ini
 
 RUN chmod 755 /*.sh
 
