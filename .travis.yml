@@ -1,0 +1,40 @@
+sudo: required
+dist: trusty
+
+language: generic
+
+services:
+  - docker
+
+env:
+  global:
+    - IMAGE_NAME=ezsystems/php
+    - LATEST="7.0"
+  matrix:
+    # Run once per Dockerfile-<PHP_VERSION>
+    - PHP_VERSION="5.5"
+    - PHP_VERSION="5.6"
+    - PHP_VERSION="7.0"
+
+before_script: docker build --rm=true --pull -f php/Dockerfile-${PHP_VERSION}  -t ${IMAGE_NAME}:${PHP_VERSION} php
+
+# Execute both test and push under script, so job will fail on failed deployment
+script:
+  - bin/.travis/test.sh ${IMAGE_NAME}:${PHP_VERSION}
+  - if [ "$TRAVIS_TAG" != "" ]; then bin/.travis/push.sh ${IMAGE_NAME} ${PHP_VERSION} ${TRAVIS_TAG}; fi
+
+# test only master (+ Pull requests)
+branches:
+  only:
+    - master
+    - "7.0"
+    - "5.6"
+    - "5.5"
+
+# disable mail notifications
+notifications:
+  email: false
+
+# reduce depth (history) of git checkout
+git:
+  depth: 30
