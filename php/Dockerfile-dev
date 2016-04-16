@@ -1,0 +1,16 @@
+FROM ez_php
+
+# Add additional packages for dev use
+RUN apk add --no-cache --virtual .persistent-deps \
+    git \
+    less \
+    mariadb-client \
+    vim \
+    wget \
+    sudo \
+    tree \
+    unzip
+
+# Install xdebug
+RUN yes | pecl install xdebug
+COPY config/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini

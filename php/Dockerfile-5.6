@@ -74,17 +74,6 @@ ADD config/ez-php.ini /usr/local/etc/php/conf.d/ez-php.ini
 
 RUN chmod 755 /*.sh
 
-# Dev packages, planned to be moved to seperate layer
-RUN apk add --no-cache --virtual .dev-deps \
-    git \
-    less \
-    mariadb-client \
-    vim \
-    wget \
-    sudo \
-    tree \
-    unzip
-
 WORKDIR /var/www
 
 CMD /run.sh

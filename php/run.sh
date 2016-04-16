@@ -43,8 +43,8 @@ parseCommandlineOptions $1 $2
 getAppFolder
 
 # If using Dockerfile-dev and we are dealing with ezp 5.4 we'll need to replace xdebug.ini
-if [[ "$APP_FOLDER" == "ezpublish" && -f /etc/php5/mods-available/xdebug.ini-ezp54 ]]; then
-    cp /etc/php5/mods-available/xdebug.ini-ezp54 /etc/php5/mods-available/xdebug.ini
+if [[ "$APP_FOLDER" == "ezpublish" && -f ${PHP_INI_DIR}/conf.d/xdebug.ini ]]; then
+    sed -i "s@/var/www/app/log@/var/www/ezpublish/log@" ${PHP_INI_DIR}/conf.d/xdebug.ini
 fi
 
 # Prepare for setup wizard if requested
