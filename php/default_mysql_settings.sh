@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # usage : source /default_mysql_settings.sh
 

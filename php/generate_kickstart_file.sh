@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Parameter $1 is value of EZ_KICKSTART_FROM_TEMPLATE ( could be empty )
 

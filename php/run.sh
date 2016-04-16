@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script accepts the following environment variable:
 # - EZ_KICKSTART ( "true" or "false" )

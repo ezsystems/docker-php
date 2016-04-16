@@ -1,52 +1,46 @@
-FROM php:5.6-fpm
+FROM php:5.6-fpm-alpine
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform
 #
 # It has two modes of operation:
 # - (default run.sh cmd) Reconfigure eZ Platform/Publish based on provided env variables and start php-fpm
-# - (bash|php|composer) Allows to execute composer, php or bash against the install
+# - (sh|php|composer) Allows to execute composer, php or bash against the image
 
 # Set defaults for variables used by run.sh
 # If you change MAX_EXECUTION TIME, also change fastcgi_read_timeout accordingly in nginx!
-ENV DEBIAN_FRONTEND=noninteractive \
-    TIMEZONE=Europe/Warsaw \
+ENV TIMEZONE=Europe/Warsaw \
     MEMORY_LIMIT=256M \
     MAX_EXECUTION_TIME=90 \
     PORT=9000 \
     COMPOSER_HOME=/home/ez/.composer
 
-## Get packages
-### unzip needed due to https://github.com/composer/composer/issues/4471
-RUN apt-get update -q -y \
- && apt-get install -q -y --force-yes --no-install-recommends \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
+
+RUN set -xe \
+	&& apk add --no-cache --virtual .build-deps \
+        freetype-dev \
+        libjpeg-turbo-dev \
         libxpm-dev \
-        libpng12-dev \
-        libicu-dev \
-        libxslt1-dev \
-        mysql-client \
-        curl \
-        wget \
-        ca-certificates \
-        less \
-        vim \
-        git \
-        acl \
-        sudo \
-        tree \
-        unzip \
-        && rm -rf /var/lib/apt/lists/*
+        libpng-dev \
+        icu-dev \
+        libxslt-dev \
+        sed \
+    && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
+    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
+    && docker-php-ext-enable opcache \
+	&& runDeps="$( \
+		scanelf --needed --nobanner --recursive /usr/local \
+			| awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
+			| sort -u \
+			| xargs -r apk info --installed \
+			| sort -u \
+	)" \
+	&& apk add --virtual .php-rundeps $runDeps \
+	&& apk del .build-deps
 
-# Install and configure php plugins
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
- && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
- && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
- && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
- && docker-php-ext-enable opcache
-
-# Set timezone
-RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+# Set timezone http://wiki.alpinelinux.org/wiki/Setting_the_timezone
+#RUN echo $TIMEZONE > /etc/timezone
 
 # Set some php.ini config
 RUN cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
@@ -54,18 +48,13 @@ RUN cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
  && echo "memory_limit = $MEMORY_LIMIT" >> /usr/local/etc/php/php.ini \
  && echo "max_execution_time = $MAX_EXECUTION_TIME" >> /usr/local/etc/php/php.ini
 
-# Disable daemonizeing php-fpm
-#RUN sed -i "s@^;daemonize = yes*@daemonize = no@" /usr/local/etc/php-fpm.conf
-
 # Add pid file to be able to restart php-fpm
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" /usr/local/etc/php-fpm.conf
 
-# Set listen socket for php-fpm
-#RUN sed -i "s@^listen = 127.0.0.1:9000@listen = $PORT@" /usr/local/etc/php-fpm.d/www.conf.default \
-# && sed -i "s@^user = nobody@user = www-data@" /usr/local/etc/php-fpm.d/www.conf.default \
-# && sed -i "s@^group = nobody@group = www-data@" /usr/local/etc/php-fpm.d/www.conf.default
+RUN addgroup -g 10000 ez \
+ && adduser -g ez -G www-data -u 10000 -h /home/ez -D ez \
+ && echo "umask 0002" >> /etc/profile
 
-RUN groupadd -g 10000 ez && useradd -g ez -G www-data -u 10000 ez --create-home && echo "umask 0002" >> /etc/bash.bashrc
 # Create Composer directory (cache and auth files)
 RUN mkdir -p $COMPOSER_HOME && chown ez:ez $COMPOSER_HOME
 
@@ -86,6 +75,16 @@ ADD config/ez-php.ini /usr/local/etc/php/conf.d/ez-php.ini
 
 RUN chmod 755 /*.sh
 
+# Dev packages, planned to be moved to seperate layer
+RUN apk add --no-cache --virtual .dev-deps \
+    git \
+    less \
+    mariadb-client \
+    vim \
+    wget \
+    sudo \
+    tree \
+    unzip
 
 WORKDIR /var/www
 
