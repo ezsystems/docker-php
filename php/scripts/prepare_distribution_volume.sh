@@ -77,7 +77,7 @@ function warm_cache
     if [ -d ezpublish ]; then
         APP_FOLDER="ezpublish"
     fi
-    sudo -u ez php $APP_FOLDER/console cache:warmup --env=$EZ_ENVIRONMENT
+    sudo -u ez php $APP_FOLDER/console cache:warmup
 }
 
 prevent_multiple_execuition

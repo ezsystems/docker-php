@@ -8,7 +8,7 @@ FROM php:5.6-fpm-alpine
 
 # Set defaults for variables used by run.sh
 # If you change MAX_EXECUTION TIME, also change fastcgi_read_timeout accordingly in nginx!
-ENV TIMEZONE=Europe/Warsaw \
+ENV TIMEZONE=UTC \
     MEMORY_LIMIT=256M \
     MAX_EXECUTION_TIME=90 \
     PORT=9000 \
@@ -42,13 +42,13 @@ RUN set -xe \
 #RUN echo $TIMEZONE > /etc/timezone
 
 # Set some php.ini config
-RUN cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
- && echo "date.timezone = $TIMEZONE" >> /usr/local/etc/php/php.ini \
- && echo "memory_limit = $MEMORY_LIMIT" >> /usr/local/etc/php/php.ini \
- && echo "max_execution_time = $MAX_EXECUTION_TIME" >> /usr/local/etc/php/php.ini
+RUN cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
+ && echo "date.timezone = $TIMEZONE" >> ${PHP_INI_DIR}/php.ini \
+ && echo "memory_limit = $MEMORY_LIMIT" >> ${PHP_INI_DIR}/php.ini \
+ && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini
 
 # Add pid file to be able to restart php-fpm
-RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" /usr/local/etc/php-fpm.conf
+RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
 RUN addgroup -g 10000 ez \
  && adduser -g ez -G www-data -u 10000 -h /home/ez -D ez \
@@ -58,24 +58,18 @@ RUN addgroup -g 10000 ez \
 RUN mkdir -p $COMPOSER_HOME && chown ez:ez $COMPOSER_HOME
 
 # Get Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin && mv /usr/local/bin/composer.phar /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # As application is put in as volume we do all needed operation on run
-ADD run.sh /run.sh
-ADD generate_kickstart_file.sh /generate_kickstart_file.sh
-ADD prepare_distribution_volume.sh /prepare_distribution_volume.sh
-ADD prepare_behat.sh /prepare_behat.sh
-ADD default_mysql_settings.sh /default_mysql_settings.sh
-ADD wait_for_db.sh /wait_for_db.sh
-ADD set_permissions.sh /set_permissions.sh
+COPY scripts /scripts
 
 # Add some custom config
-ADD config/ez-php.ini /usr/local/etc/php/conf.d/ez-php.ini
+COPY config/php.ini ${PHP_INI_DIR}/conf.d/php.ini
 
-RUN chmod 755 /*.sh
+RUN chmod 755 /scripts/*.sh
 
 WORKDIR /var/www
 
-CMD /run.sh
+CMD /scripts/run.sh
 
 EXPOSE 9000

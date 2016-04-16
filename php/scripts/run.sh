@@ -31,6 +31,7 @@ function parseCommandlineOptions
     fi
 }
 
+# By default app folder is "app", but "ezpublish" is selected if found for bc.
 function getAppFolder
 {
     APP_FOLDER="app"
@@ -57,20 +58,15 @@ if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" == "false" ]; then
     sudo -u ez mkdir web/var
 fi
 
-APP_FOLDER="app"
-if [ -d ezpublish ]; then
-    APP_FOLDER="ezpublish"
-fi
-
-if [ "$EZ_ENVIRONMENT" != "dev" ]; then
+if [[ "$SYMFONY_ENV" != "dev" && "$SYMFONY_ENV" != "" ]]; then
     echo "Re-generate symlink assets in case rsync was used so asstets added during setup wizards are reachable"
-    sudo -u ez php $APP_FOLDER/console assetic:dump --env $EZ_ENVIRONMENT
+    sudo -u ez php $APP_FOLDER/console assetic:dump
 fi
 
-sudo -u ez php $APP_FOLDER/console assets:install --symlink --relative --env $EZ_ENVIRONMENT
+sudo -u ez php $APP_FOLDER/console assets:install --symlink --relative
 
 if [ -d ezpublish_legacy ]; then
-    sudo -u ez php $APP_FOLDER/console ezpublish:legacy:assets_install --symlink --relative --env $EZ_ENVIRONMENT
+    sudo -u ez php $APP_FOLDER/console ezpublish:legacy:assets_install --symlink --relative
 fi
 
 umask 0002
