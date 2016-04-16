@@ -48,6 +48,13 @@ RUN cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
  && echo "memory_limit = $MEMORY_LIMIT" >> ${PHP_INI_DIR}/php.ini \
  && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini
 
+## Install blackfire: https://blackfire.io/docs/integrations/docker
+RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
+    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
+    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+    && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
+COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
+
 # Add pid file to be able to restart php-fpm
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
