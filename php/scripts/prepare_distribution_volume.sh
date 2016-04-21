@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Let's try to connect to db for 2 minutes ( 24 * 5 sec intervalls )
 MAXTRY=24
@@ -44,18 +44,18 @@ function import_database
     local TRY
     DBUP=false
     TRY=1
-    while [ $DBUP == "false" ]; do
+    while [ $DBUP = "false" ]; do
         echo Contacting mysql, attempt :$TRY
         set_splash_screen "Waiting for db connection"
         echo "ALTER DATABASE $MYSQL_DATABASE CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -h db && DBUP="true"
-        if [ $DBUP == "true" ]; then
+        if [ $DBUP = "true" ]; then
             DBUP=false
             echo "Importing database"
             set_splash_screen "Importing database"
             sudo -u ez mysql -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE -h db< /dbdump/ezp.sql && DBUP="true"
         fi
 
-        if [ $DBUP == "false" ]; then
+        if [ $DBUP = "false" ]; then
             echo "Attempt $TRY failed. Waiting for db connection"
             set_splash_screen "Attempt $TRY failed. Waiting for db connection"
         else

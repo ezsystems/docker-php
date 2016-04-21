@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Script accepts the following environment variable:
 # - EZ_KICKSTART ( "true" or "false" )
@@ -9,7 +9,7 @@
 # Parameters can also be given as options, in the same order:
 # ./run.sh [ EZ_KICKSTART ] [ EZ_KICKSTART_FROM_TEMPLATE ]
 
-function parseCommandlineOptions
+parseCommandlineOptions()
 {
     if [ "$1" != "" ]; then
         EZ_KICKSTART=$1
@@ -18,12 +18,12 @@ function parseCommandlineOptions
         EZ_KICKSTART_FROM_TEMPLATE="/kickstart_template.ini"
     fi
 
-    if [ "$APACHE_RUN_USER" == "" ]; then
+    if [ "$APACHE_RUN_USER" = "" ]; then
         APACHE_RUN_USER=www-data
     fi
 
     # You might set SKIP_INITIALIZING_VAR=true if you would like to setup web/var from outside this container
-    if [ "$SKIP_INITIALIZING_VAR" == "true" ]; then
+    if [ "$SKIP_INITIALIZING_VAR" = "true" ]; then
         VARDIR=""
     else
         SKIP_INITIALIZING_VAR="false"
@@ -32,7 +32,7 @@ function parseCommandlineOptions
 }
 
 # By default app folder is "app", but "ezpublish" is selected if found for bc.
-function getAppFolder
+getAppFolder()
 {
     APP_FOLDER="app"
     if [ -d ezpublish ]; then
@@ -44,7 +44,7 @@ parseCommandlineOptions $1 $2
 getAppFolder
 
 # If using Dockerfile-dev and we are dealing with ezp 5.4 we'll need to replace xdebug.ini
-if [[ "$APP_FOLDER" == "ezpublish" && -f ${PHP_INI_DIR}/conf.d/xdebug.ini ]]; then
+if [ "$APP_FOLDER" = "ezpublish" ] && [ -f ${PHP_INI_DIR}/conf.d/xdebug.ini ]; then
     sed -i "s@/var/www/app/log@/var/www/ezpublish/log@" ${PHP_INI_DIR}/conf.d/xdebug.ini
 fi
 
@@ -53,12 +53,18 @@ if [ "$EZ_KICKSTART" = "true" ]; then
   /generate_kickstart_file.sh $EZ_KICKSTART_FROM_TEMPLATE
 fi
 
-echo "Setting permissions on eZ Publish folder as they might be broken if rsync is used"
-if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" == "false" ]; then
-    sudo -u ez mkdir web/var
+
+if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" = "false" ]; then
+    echo "Creating web/var as it was missing"
+    sudo -u ez mkdir -m 2775 web/var
 fi
 
-if [[ "$SYMFONY_ENV" != "dev" && "$SYMFONY_ENV" != "" ]]; then
+if [ ! -d app/cache/$SYMFONY_ENV ]; then
+    echo "Creating cache folder for $SYMFONY_ENV as it was missing"
+    sudo -u ez mkdir -m 2775 app/cache/$SYMFONY_ENV
+fi
+
+if [ "$SYMFONY_ENV" != "dev" ] && [ "$SYMFONY_ENV" != "" ]; then
     echo "Re-generate symlink assets in case rsync was used so asstets added during setup wizards are reachable"
     sudo -u ez php $APP_FOLDER/console assetic:dump
 fi

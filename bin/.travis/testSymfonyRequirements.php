@@ -25,5 +25,5 @@ if ( $error ) {
     echo "FAILED: See above for failed requirements and/or recommendations!\n";
     exit(1);
 } else {
-    echo "PASSED: No failed requirements or recommendations found!\n";
+    echo "OK: No failed requirements or recommendations found!\n";
 }

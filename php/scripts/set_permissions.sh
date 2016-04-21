@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -6,12 +6,12 @@ PARAM_WWW_DATA="true"
 PARAM_DEV="false"
 PARAM_PROD="false"
 
-if [ "$APACHE_RUN_USER" == "" ]; then
+if [ "$APACHE_RUN_USER" = "" ]; then
     APACHE_RUN_USER=www-data
 fi
 
 
-function usage
+usage()
 {
     # General help text
     cat << EOF
@@ -35,7 +35,7 @@ EOF
 }
 
 
-function parse_commandline_arguments
+parse_commandline_arguments()
 {
     # Based on http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash, comment by Shane Day answered Jul 1 '14 at 1:20
     while [ -n "$1" ]; do
@@ -88,17 +88,17 @@ function parse_commandline_arguments
     eval set -- $REMAINS
 }
 
-function validate_commandline_arguments
+validate_commandline_arguments()
 {
-    if [ "$PARAM_DEV" == "true" ] && [ "$PARAM_PROD" == "true" ]; then
+    if [ "$PARAM_DEV" = "true" ] && [ "$PARAM_PROD" = "true" ]; then
         usage
         echo "Error : You cannot provide both --dev and --prod at the same time"
     fi
 }
 
-function set_permissions_dev
+set_permissions_dev()
 {
-    if [ "$PARAM_DEV" == "true" ]; then
+    if [ "$PARAM_DEV" = "true" ]; then
         chmod g+w -R /var/www
         find /var/www -type d -exec chmod 2775 {} ';'
         chown ez:ez -R /var/www
@@ -106,16 +106,16 @@ function set_permissions_dev
     fi
 }
 
-function set_permissions_prod
+set_permissions_prod()
 {
-    if [ "$PARAM_PROD" == "true" ]; then
+    if [ "$PARAM_PROD" = "true" ]; then
         chmod g-w -R /var/www
         find /var/www -type d -exec chmod a-w,g-s,a+rx,u+w {} ';'
         chown root:root -R /var/www
     fi
 }
 
-function set_permissions_www_data
+set_permissions_www_data()
 {
     local APP_FOLDER
     APP_FOLDER="app"
@@ -126,7 +126,7 @@ function set_permissions_www_data
     fi
 
     # You might set SKIP_INITIALIZING_VAR=true if you would like to setup web/var from outside this container
-    if [ "$SKIP_INITIALIZING_VAR" == "true" ]; then
+    if [ "$SKIP_INITIALIZING_VAR" = "true" ]; then
         VARDIR=""
     else
         SKIP_INITIALIZING_VAR="false"

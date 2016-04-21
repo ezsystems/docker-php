@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
 # Parameter $1 is value of EZ_KICKSTART_FROM_TEMPLATE ( could be empty )
 
@@ -11,7 +11,7 @@ if [ ! -f ezpublish_legacy/kickstart.ini-dist ]; then
     exit 1;
 fi
 
-if [ "aa$1" == "aa" ]; then
+if [ "aa$1" = "aa" ]; then
     echo "Generating kickstart.ini"
 
     echo "[database_choice]

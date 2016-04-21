@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * This script contains code for waiting for db to get up for up to 2min
