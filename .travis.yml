@@ -20,8 +20,7 @@ before_script: bin/.travis/build.sh ${PHP_VERSION}
 
 # Execute both test and push under script, so job will fail on failed deployment
 script:
-  # Internal auth token dedicated to testing with travis+composer on ezsystems repos, not for reuse!
-  - mkdir -pm 0777 ~/.composer
+  # Internal auth token dedicated to testing with travis+composer on ezsystems repos, not for reuse.
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
   - bin/.travis/test.sh
   - if [ "$TRAVIS_TAG" != "" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${TRAVIS_TAG}; fi

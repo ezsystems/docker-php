@@ -43,6 +43,8 @@ getAppFolder()
 parseCommandlineOptions $1 $2
 getAppFolder
 
+umask 002
+
 # If using Dockerfile-dev and we are dealing with ezp 5.4 we'll need to replace xdebug.ini
 if [ "$APP_FOLDER" = "ezpublish" ] && [ -f ${PHP_INI_DIR}/conf.d/xdebug.ini ]; then
     sed -i "s@/var/www/app/log@/var/www/ezpublish/log@" ${PHP_INI_DIR}/conf.d/xdebug.ini
@@ -52,7 +54,6 @@ fi
 if [ "$EZ_KICKSTART" = "true" ]; then
   /generate_kickstart_file.sh $EZ_KICKSTART_FROM_TEMPLATE
 fi
-
 
 if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" = "false" ]; then
     echo "Creating web/var as it was missing"
@@ -64,18 +65,6 @@ if [ ! -d app/cache/$SYMFONY_ENV ]; then
     sudo -u ez mkdir -m 2775 app/cache/$SYMFONY_ENV
 fi
 
-if [ "$SYMFONY_ENV" != "dev" ] && [ "$SYMFONY_ENV" != "" ]; then
-    echo "Re-generate symlink assets in case rsync was used so asstets added during setup wizards are reachable"
-    sudo -u ez php $APP_FOLDER/console assetic:dump
-fi
-
-sudo -u ez php $APP_FOLDER/console assets:install --symlink --relative
-
-if [ -d ezpublish_legacy ]; then
-    sudo -u ez php $APP_FOLDER/console ezpublish:legacy:assets_install --symlink --relative
-fi
-
-umask 0002
 
 # Start php-fpm
 if [ -x /usr/local/sbin/php-fpm ]; then
