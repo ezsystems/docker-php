@@ -98,19 +98,16 @@ validate_commandline_arguments()
 
 set_permissions_dev()
 {
-    if [ "$PARAM_DEV" = "true" ]; then
-        chmod g+w -R /var/www
-        find /var/www -type d -exec chmod 2775 {} ';'
+    if [ "$PARAM_DEV" == "true" ]; then
+        chmod a+w -R /var/www
         chown ez:ez -R /var/www
-        chown root -R /var/www/web/var
     fi
 }
 
 set_permissions_prod()
 {
-    if [ "$PARAM_PROD" = "true" ]; then
-        chmod g-w -R /var/www
-        find /var/www -type d -exec chmod a-w,g-s,a+rx,u+w {} ';'
+    if [ "$PARAM_PROD" == "true" ]; then
+        chmod og-w -R /var/www
         chown root:root -R /var/www
     fi
 }
@@ -139,19 +136,15 @@ set_permissions_www_data()
 
     # eZ Publish 5.4 stuff
     if [ -d ezpublish/sessions ]; then
-        find ezpublish/sessions -type d | xargs --no-run-if-empty chmod -R 2775
-        find ezpublish/sessions -type f | xargs --no-run-if-empty chmod -R 664
-        chown :$APACHE_RUN_USER -R ezpublish/sessions
+        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/sessions
+        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/sessions
     fi
-    find ${APP_FOLDER}/{cache,logs} ${VARDIR} -type d | xargs --no-run-if-empty chmod -R 2775
-    find ${APP_FOLDER}/{cache,logs} ${VARDIR} -type f | xargs --no-run-if-empty chmod -R 664
-    chown :$APACHE_RUN_USER -R ${APP_FOLDER}/{cache,logs} ${VARDIR}
-
+    setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/{cache,logs} ${VARDIR}
+    setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/{cache,logs} ${VARDIR}
 
     if [ -d ezpublish_legacy ]; then
-        find ezpublish_legacy/{design,extension,settings,var} -type d | xargs --no-run-if-empty chmod -R 2775
-        find ezpublish_legacy/{design,extension,settings,var} -type f | xargs --no-run-if-empty chmod -R 664
-        chown :$APACHE_RUN_USER -R ezpublish_legacy/{design,extension,settings,var}
+        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/{design,extension,settings,var}
+        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/{design,extension,settings,var}
     fi
 
     # Workaround as long as installer needs write access to config/

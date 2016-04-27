@@ -65,7 +65,6 @@ if [ ! -d app/cache/$SYMFONY_ENV ]; then
     sudo -u ez mkdir -m 2775 app/cache/$SYMFONY_ENV
 fi
 
-
 # Start php-fpm
 if [ -x /usr/local/sbin/php-fpm ]; then
     exec /usr/local/sbin/php-fpm

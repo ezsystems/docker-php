@@ -58,7 +58,7 @@ COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 # Add pid file to be able to restart php-fpm
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
-RUN groupadd -g 10000 ez && useradd -g ez -G www-data -u 10000 ez --create-home && echo "umask 0002" >> /etc/bash.bashrc
+RUN groupadd -g 10000 ez && useradd -g ez -u 10000 ez --create-home
 
 # Create Composer directory (cache and auth files)
 RUN mkdir -p $COMPOSER_HOME && chown ez:ez $COMPOSER_HOME
