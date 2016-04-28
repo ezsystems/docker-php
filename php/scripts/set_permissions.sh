@@ -98,15 +98,26 @@ validate_commandline_arguments()
 
 set_permissions_dev()
 {
-    if [ "$PARAM_DEV" == "true" ]; then
+    if [ "$PARAM_DEV" = "true" ]; then
         chmod a+w -R /var/www
         chown ez:ez -R /var/www
+    fi
+
+    # Workaround as long as installer needs write access to config/
+    if [ -d app/config ]; then
+        chown :$APACHE_RUN_USER -R app/config
+        chmod 775 app/config
+        chmod 664 app/config/*
+    elif [ -d ezpublish/config ]; then
+        chown :$APACHE_RUN_USER -R ezpublish/config
+        chmod 775 ezpublish/config
+        chmod 664 ezpublish/config/*
     fi
 }
 
 set_permissions_prod()
 {
-    if [ "$PARAM_PROD" == "true" ]; then
+    if [ "$PARAM_PROD" = "true" ]; then
         chmod og-w -R /var/www
         chown root:root -R /var/www
     fi
@@ -139,25 +150,13 @@ set_permissions_www_data()
         setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/sessions
         setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/sessions
     fi
-    setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/{cache,logs} ${VARDIR}
-    setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/{cache,logs} ${VARDIR}
+    setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs ${VARDIR}
+    setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs ${VARDIR}
 
     if [ -d ezpublish_legacy ]; then
-        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/{design,extension,settings,var}
-        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/{design,extension,settings,var}
+        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/design ezpublish_legacy/extension ezpublish_legacy/settings ezpublish_legacy/var
+        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/design ezpublish_legacy/extension ezpublish_legacy/settings ezpublish_legacy/var
     fi
-
-    # Workaround as long as installer needs write access to config/
-    if [ -d app/config ]; then
-        chown :$APACHE_RUN_USER -R app/config
-        chmod 2775 app/config
-        chmod 664 app/config/*
-    elif [ -d ezpublish/config ]; then
-        chown :$APACHE_RUN_USER -R ezpublish/config
-        chmod 2775 ezpublish/config
-        chmod 664 ezpublish/config/*
-    fi
-
 }
 
 parse_commandline_arguments "$@"
