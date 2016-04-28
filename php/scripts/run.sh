@@ -60,9 +60,14 @@ if [ ! -d web/var ] && [ "$SKIP_INITIALIZING_VAR" = "false" ]; then
     sudo -u ez mkdir -m 2775 web/var
 fi
 
-if [ ! -d app/cache/$SYMFONY_ENV ]; then
+if [ ! -d $APP_FOLDER/cache/$SYMFONY_ENV ]; then
     echo "Creating cache folder for $SYMFONY_ENV as it was missing"
-    sudo -u ez mkdir -m 2775 app/cache/$SYMFONY_ENV
+    sudo -u ez mkdir -m 2775 $APP_FOLDER/cache/$SYMFONY_ENV
+fi
+
+if [ "$SYMFONY_ENV" != "dev" ] && [ "$SYMFONY_ENV" != "" ]; then
+    echo "Re-generate symlink assets in case rsync was used so asstets added during setup wizards are reachable"
+    sudo -u ez php $APP_FOLDER/console assetic:dump
 fi
 
 # Start php-fpm
