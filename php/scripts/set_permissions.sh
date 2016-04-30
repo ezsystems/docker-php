@@ -2,14 +2,8 @@
 
 set -e
 
-PARAM_WWW_DATA="true"
 PARAM_DEV="false"
-PARAM_PROD="false"
-
-if [ "$APACHE_RUN_USER" = "" ]; then
-    APACHE_RUN_USER=www-data
-fi
-
+PARAM_IMMUTABLE="false"
 
 usage()
 {
@@ -17,18 +11,19 @@ usage()
     cat << EOF
 Script for setting ownership and permissions inside eZ Platform containers
 
+By default set permission and ownership of the files the web server needs write access to ( var/web/www, app/cache etc ).
+With options additional rights on the whole installation can be set as well.
+
 Help (this text):
 /set_permissions.sh [-h|--help]
 
 Usage:
 /set_permissions.sh [ options ]...
 
-
 Options:
-  [--www-data]       : Set permission and ownership of the files the web server needs write access to ( var/web/www, app/cache etc )
-                       If no other options are given, this is the default action
+
   [--dev]            : Set permission and ownership for development use. All source files will to be writable by ez user.
-  [--prod]           : Set permission and ownership for production use. All source files to be owned by root.
+  [--immutable]      : Set permission and ownership for immutable production use. All source files to be owned by root.
   [-h|--help]        : This help screen
 
 EOF
@@ -57,14 +52,11 @@ parse_commandline_arguments()
                     usage
                     exit 0
                     ;;
-                --www-data )
-                    PARAM_WWW_DATA="true"
-                    ;;
                 --dev )
                     PARAM_DEV="true"
                     ;;
-                --prod )
-                    PARAM_PROD="true"
+                --immutable )
+                    PARAM_IMMUTABLE="true"
                     ;;
                 # Anything unknown is recorded for later
                 * )
@@ -90,9 +82,9 @@ parse_commandline_arguments()
 
 validate_commandline_arguments()
 {
-    if [ "$PARAM_DEV" = "true" ] && [ "$PARAM_PROD" = "true" ]; then
+    if [ "$PARAM_DEV" = "true" ] && [ "$PARAM_IMMUTABLE" = "true" ]; then
         usage
-        echo "Error : You cannot provide both --dev and --prod at the same time"
+        echo "Error : You cannot provide both --dev and --immutable at the same time"
     fi
 }
 
@@ -103,21 +95,17 @@ set_permissions_dev()
         chown ez:ez -R /var/www
     fi
 
-    # Workaround as long as installer needs write access to config/
-    if [ -d app/config ]; then
-        chown :$APACHE_RUN_USER -R app/config
-        chmod 775 app/config
-        chmod 664 app/config/*
-    elif [ -d ezpublish/config ]; then
-        chown :$APACHE_RUN_USER -R ezpublish/config
+    # ezpublish 5.x needs access to write to config folder
+    if [ -d ezpublish/config ]; then
+        chown :www-data -R ezpublish/config
         chmod 775 ezpublish/config
         chmod 664 ezpublish/config/*
     fi
 }
 
-set_permissions_prod()
+set_permissions_immutable()
 {
-    if [ "$PARAM_PROD" = "true" ]; then
+    if [ "$PARAM_IMMUTABLE" = "true" ]; then
         chmod og-w -R /var/www
         chown root:root -R /var/www
     fi
@@ -127,44 +115,35 @@ set_permissions_www_data()
 {
     local APP_FOLDER
     APP_FOLDER="app"
-
-    # eZ Publish 5.4 stuff
     if [ -d ezpublish ]; then
         APP_FOLDER="ezpublish"
     fi
 
-    # You might set SKIP_INITIALIZING_VAR=true if you would like to setup web/var from outside this container
-    if [ "$SKIP_INITIALIZING_VAR" = "true" ]; then
-        VARDIR=""
-    else
-        SKIP_INITIALIZING_VAR="false"
-        VARDIR="web/var"
+    if [ ! -d web/var ]; then
+        sudo -u ez mkdir -m 2775 web/var
     fi
 
-    if [ ! -d web/var ]; then
-        mkdir web/var
-    fi
+    setfacl -R -m u:www-data:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs web/var
+    setfacl -dR -m u:www-data:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs web/var
 
     # eZ Publish 5.4 stuff
     if [ -d ezpublish/sessions ]; then
-        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/sessions
-        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish/sessions
+        setfacl -R -m u:www-data:rwX -m u:ez:rwX ezpublish/sessions
+        setfacl -dR -m u:www-data:rwX -m u:ez:rwX ezpublish/sessions
     fi
-    setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs ${VARDIR}
-    setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs ${VARDIR}
 
+    # ezpublish-legacy stuff
     if [ -d ezpublish_legacy ]; then
-        setfacl -R -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/design ezpublish_legacy/extension ezpublish_legacy/settings ezpublish_legacy/var
-        setfacl -dR -m u:$APACHE_RUN_USER:rwX -m u:ez:rwX ezpublish_legacy/design ezpublish_legacy/extension ezpublish_legacy/settings ezpublish_legacy/var
+        setfacl -R -m u:www-data:rwX -m u:ez:rwX ezpublish_legacy/design ezpublish_legacy/extension ezpublish_legacy/settings ezpublish_legacy/var
+        setfacl -dR -m u:www-data:rwX -m u:ez:rwX ezpublish_legacy/design ezpublish_legacy/extension ezpublish_legacy/settings ezpublish_legacy/var
     fi
 }
 
 parse_commandline_arguments "$@"
 validate_commandline_arguments
 
-
 cd /var/www
 set_permissions_dev
-set_permissions_prod
+set_permissions_immutable
 set_permissions_www_data
 cd - > /dev/null
