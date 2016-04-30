@@ -8,22 +8,22 @@ services:
 
 env:
   global:
-    - REMOTE_IMAGE=ezsystems/php
+    - REMOTE_IMAGE="ezsystems/php"
     - LATEST="7.0"
+    - FORMAT_VERSION="v0"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
     - PHP_VERSION="5.5"
     - PHP_VERSION="5.6"
     - PHP_VERSION="7.0"
 
-before_script: bin/.travis/build.sh ${PHP_VERSION}
-
-# Execute both test and push under script, so job will fail on failed deployment
-script:
-  # Internal auth token dedicated to testing with travis+composer on ezsystems repos, not for reuse.
+before_script:
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
-  - bin/.travis/test.sh
-  - if [ "$TRAVIS_TAG" != "" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${TRAVIS_TAG}; fi
+  - bin/.travis/build.sh ${PHP_VERSION}
+
+script: bin/.travis/test.sh
+
+after_success: if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${FORMAT_VERSION}; fi
 
 # test only master (+ Pull requests)
 branches:
