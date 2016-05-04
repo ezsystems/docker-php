@@ -9,8 +9,8 @@ tweaks and extensions for optimal use with eZ Platform and eZ Studio, in additio
 
 ## Overview
 
-This is part of our [ez-docker-tools](https://github.com/ezsystems/docker-tools), currently in beta, and hence images
-here are tagged as v0.x.y.
+This is part of our [ez-docker-tools](https://github.com/ezsystems/docker-tools), currently in beta, and hence docker hub
+tags is in the format `ezsystems/php:7.0-v0`.
 
 Aim is to reach stable sometime in second half of 2016, after a periode of testing by community.
 
