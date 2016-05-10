@@ -4,12 +4,12 @@ FROM php:5.5-fpm
 #
 # It has two modes of operation:
 # - (default run.sh cmd) Reconfigure eZ Platform/Publish based on provided env variables and start php-fpm
-# - (bash|php|composer) Allows to execute composer, php or bash against the install
+# - (bash|php|composer) Allows to execute composer, php or bash against the image
 
 # Set defaults for variables used by run.sh
 # If you change MAX_EXECUTION TIME, also change fastcgi_read_timeout accordingly in nginx!
 ENV DEBIAN_FRONTEND=noninteractive \
-    TIMEZONE=Europe/Warsaw \
+    TIMEZONE=UTC \
     MEMORY_LIMIT=256M \
     MAX_EXECUTION_TIME=90 \
     PORT=9000 \
@@ -25,16 +25,10 @@ RUN apt-get update -q -y \
         libpng12-dev \
         libicu-dev \
         libxslt1-dev \
-        mysql-client \
-        curl \
-        wget \
         ca-certificates \
-        less \
-        vim \
-        git \
+        curl \
         acl \
         sudo \
-        tree \
         unzip \
         && rm -rf /var/lib/apt/lists/*
 
@@ -49,46 +43,39 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
 RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
 # Set some php.ini config
-RUN cp /usr/src/php/php.ini-production /usr/local/etc/php/php.ini \
- && echo "date.timezone = $TIMEZONE" >> /usr/local/etc/php/php.ini \
- && echo "memory_limit = $MEMORY_LIMIT" >> /usr/local/etc/php/php.ini \
- && echo "max_execution_time = $MAX_EXECUTION_TIME" >> /usr/local/etc/php/php.ini
+RUN cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
+ && echo "date.timezone = $TIMEZONE" >> ${PHP_INI_DIR}/php.ini \
+ && echo "memory_limit = $MEMORY_LIMIT" >> ${PHP_INI_DIR}/php.ini \
+ && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini
 
-# Disable daemonizeing php-fpm
-#RUN sed -i "s@^;daemonize = yes*@daemonize = no@" /usr/local/etc/php-fpm.conf
+## Install blackfire: https://blackfire.io/docs/integrations/docker
+RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
+    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
+    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+    && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
+COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 
 # Add pid file to be able to restart php-fpm
-RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" /usr/local/etc/php-fpm.conf
-
-# Set listen socket for php-fpm
-#RUN sed -i "s@^listen = 127.0.0.1:9000@listen = $PORT@" /usr/local/etc/php-fpm.d/www.conf.default \
-# && sed -i "s@^user = nobody@user = www-data@" /usr/local/etc/php-fpm.d/www.conf.default \
-# && sed -i "s@^group = nobody@group = www-data@" /usr/local/etc/php-fpm.d/www.conf.default
+RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
 RUN groupadd -g 10000 ez && useradd -g ez -G www-data -u 10000 ez --create-home && echo "umask 0002" >> /etc/bash.bashrc
+
 # Create Composer directory (cache and auth files)
 RUN mkdir -p $COMPOSER_HOME && chown ez:ez $COMPOSER_HOME
 
 # Get Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin && mv /usr/local/bin/composer.phar /usr/local/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # As application is put in as volume we do all needed operation on run
-ADD run.sh /run.sh
-ADD generate_kickstart_file.sh /generate_kickstart_file.sh
-ADD prepare_distribution_volume.sh /prepare_distribution_volume.sh
-ADD prepare_behat.sh /prepare_behat.sh
-ADD default_mysql_settings.sh /default_mysql_settings.sh
-ADD wait_for_db.sh /wait_for_db.sh
-ADD set_permissions.sh /set_permissions.sh
+COPY scripts /scripts
 
 # Add some custom config
-ADD config/ez-php.ini /usr/local/etc/php/conf.d/ez-php.ini
+COPY config/php.ini ${PHP_INI_DIR}/conf.d/php.ini
 
-RUN chmod 755 /*.sh
-
+RUN chmod 755 /scripts/*.sh
 
 WORKDIR /var/www
 
-CMD /run.sh
+CMD /scripts/run.sh
 
 EXPOSE 9000

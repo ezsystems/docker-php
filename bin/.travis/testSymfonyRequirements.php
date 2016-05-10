@@ -1,8 +1,8 @@
 <?php
 
-echo ( "Running testSymfonyRequirements.php...\n" );
+echo ("Running testSymfonyRequirements.php...\n");
 
-require_once dirname(__FILE__).'/app/SymfonyRequirements.php';
+require_once dirname(__FILE__) . '/app/SymfonyRequirements.php';
 
 $symfonyRequirements = new SymfonyRequirements();
 
@@ -11,17 +11,19 @@ $minorProblems = $symfonyRequirements->getFailedRecommendations();
 
 $error = false;
 
-if ( count ( $majorProblems ) > 0 )
-{
-    var_dump( $majorProblems );
+if (!empty($majorProblems)) {
+    var_dump($majorProblems);
     $error = true;
 }
 
-if ( count ( $minorProblems ) > 0 )
-{
-    var_dump( $minorProblems );
+if (!empty($minorProblems)) {
+    var_dump($minorProblems);
     $error = true;
 }
 
-if ( $error )
-    exit( 1 );
+if ( $error ) {
+    echo "FAILED: See above for failed requirements and/or recommendations!\n";
+    exit(1);
+} else {
+    echo "OK: No failed requirements or recommendations found!\n";
+}
