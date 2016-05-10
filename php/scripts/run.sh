@@ -8,8 +8,6 @@
 # ./run.sh --dev-mode
 
 DEV_MODE="false"
-SET_DEV_PERMISSIONS="false"
-ASSETIC_DUMP="false"
 EZ_KICKSTART_TEMPLATE=""
 
 ## Parse arguments
