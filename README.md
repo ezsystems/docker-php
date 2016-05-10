@@ -42,9 +42,9 @@ It is recommended to specificy a tag with this format version number in your Doc
 ## Roadmap
 
 - PHP plugins:
--- memcached; *once [stable for 7.0](https://github.com/php-memcached-dev/php-memcached/releases)*
--- redis/predis
--- pdo_pgsql + pdo_sqlite
+ - memcached; *once [stable for 7.0](https://github.com/php-memcached-dev/php-memcached/releases)*
+ - redis/predis
+ - pdo_pgsql + pdo_sqlite
 - env variable to set session handler
 - Alpine Linux; *once all other official images exists with alpine flavours to make sure users are the same, and when blackfire supports it*
 
