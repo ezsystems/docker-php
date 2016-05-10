@@ -1,9 +1,8 @@
 # About
 
-Contains Docker PHP images that in the future will be supported and recommended by [eZ Systems](http://ez.no/)
-for use with [eZ Platform](http://ezplatform.com/) and [eZ Studio](http://ezstudio.com/).
+This Git repository contains source code for [eZ Systems provided Docker PHP images avaiable on Docker Hub](https://hub.docker.com/r/ezsystems/php/) that in the future will be supported and recommended by [eZ Systems](http://ez.no/) for use with [eZ Platform](http://ezplatform.com/) and [eZ Studio](http://ezstudio.com/).
 
-The Docker images here extends [official PHP images](https://hub.docker.com/_/php/) and includes php-cli, php-fpm, [composer](https://getcomposer.org/), [blackfire](https://blackfire.io/), tweaks and extensions for optimal use with advance Symfony applications like eZ Platform and eZ Studio.
+The Docker images here extends [official PHP images](https://hub.docker.com/_/php/) and includes php-cli, php-fpm, [composer](https://getcomposer.org/), [blackfire](https://blackfire.io/), tweaks and extensions for optimal use with any advance Symfony applications *(like eZ Platform and eZ Studio)*.
 
 
 ## Overview
