@@ -27,19 +27,20 @@ esac
 done
 
 
-# If using Dockerfile-dev and we are dealing with ezp 5.4 we'll need to replace xdebug.ini
+# EZP5: If using Dockerfile-dev and we are dealing with ezp 5.4 we'll need to replace xdebug.ini
 if [ -d ezpublish ] && [ -f ${PHP_INI_DIR}/conf.d/xdebug.ini ]; then
     sed -i "s@/var/www/app/log@/var/www/ezpublish/log@" ${PHP_INI_DIR}/conf.d/xdebug.ini
 fi
 
-# Prepare for eZ Publish legacy setup wizard if requested
+# EZP5: Prepare for eZ Publish legacy setup wizard if requested
 if [ "$EZ_KICKSTART_TEMPLATE" != "" ]; then
     /scripts/generate_kickstart_file.sh $EZ_KICKSTART_TEMPLATE
 fi
 
 if [ "$DEV_MODE" = "true" ]; then
-    # By default app folder is "app", but "ezpublish" is selected if found for bc.
     APP_FOLDER="app"
+
+    # EZP5: By default app folder is "app", but "ezpublish" is selected if found for bc.
     if [ -d ezpublish ]; then
         APP_FOLDER="ezpublish"
     fi
@@ -48,6 +49,9 @@ if [ "$DEV_MODE" = "true" ]; then
         echo "Creating web/var as it was missing"
         sudo -u ez mkdir -m 2775 web/var
     fi
+
+    echo "Clearing cache directories '$APP_FOLDER/cache/*/*' so new settings gets picked up"
+    rm -Rf $APP_FOLDER/cache/*/*
 
     if [ ! -d $APP_FOLDER/cache/$SYMFONY_ENV ]; then
         echo "Creating cache folder for $SYMFONY_ENV as it was missing"

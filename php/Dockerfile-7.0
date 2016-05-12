@@ -76,6 +76,6 @@ RUN chmod 755 /scripts/*.sh
 
 WORKDIR /var/www
 
-CMD /scripts/run.sh
+CMD /scripts/run.sh --dev-mode
 
 EXPOSE 9000
