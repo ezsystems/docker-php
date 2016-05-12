@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # Builds ez_php:latest and ez_php:latest-dev locally to avoid issues when pushing.
 
 set -e
 
-if [ "$1" == "" ]; then
+if [ "$1" = "" ]; then
     echo "Argument 1 variable PHP_VERSION (and default tag) is not set, format: 7.0. Bailing out !"
     exit 1
 fi

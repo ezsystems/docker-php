@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -6,17 +6,17 @@ set -e
 # - ez_php:latest
 # - ez_php:latest-dev
 
-function validateEnvironment
+validateEnvironment()
 {
-    if [ "$DOCKER_EMAIL" == "" ]; then
+    if [ "$DOCKER_EMAIL" = "" ]; then
         echo "Environment variable DOCKER_EMAIL is not set. Bailing out !"
         exit 1
     fi
-    if [ "$DOCKER_USERNAME" == "" ]; then
+    if [ "$DOCKER_USERNAME" = "" ]; then
         echo "Environment variable DOCKER_USERNAME is not set. Bailing out !"
         exit 1
     fi
-    if [ "$DOCKER_PASSWORD" == "" ]; then
+    if [ "$DOCKER_PASSWORD" = "" ]; then
         echo "Environment variable DOCKER_PASSWORD is not set. Bailing out !"
         exit 1
     fi
@@ -24,17 +24,12 @@ function validateEnvironment
 
 validateEnvironment
 
-if [ "$1" == "" ]; then
+if [ "$1" = "" ]; then
     echo "Argument 1 variable REMOTE_IMAGE is not set, format: ezsystems/php. Bailing out !"
-    exit 1
-fi
-if [ "$2" == "" ]; then
-    echo "Argument 2 variable FORMAT_VERSION is not set, format: v0 or v1 .. Bailing out !"
     exit 1
 fi
 
 REMOTE_IMAGE="$1"
-FORMAT_VERSION="$2"
 PHP_VERSION=`docker -l error run ez_php:latest php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;"`
 
 docker images
@@ -47,11 +42,13 @@ docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}"
 docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-dev"
 
 # "7.0-v0"
-docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${FORMAT_VERSION}"
-docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-${FORMAT_VERSION}-dev"
+if [ "$2" != "" ]; then
+    docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${2}"
+    docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-${2}-dev"
+fi
 
 # "latest" (optional)
-if [ "$LATEST" == "$PHP_VERSION" ]; then
+if [ "$LATEST" = "$PHP_VERSION" ]; then
     docker tag ez_php:latest "${REMOTE_IMAGE}:latest"
 fi
 
@@ -61,5 +58,5 @@ fi
 #docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}"
 #docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-dev"
 
-echo Pushing docker image with all tags : ${REMOTE_IMAGE}
+echo "Pushing docker image with all tags : ${REMOTE_IMAGE}"
 docker push "${REMOTE_IMAGE}"
