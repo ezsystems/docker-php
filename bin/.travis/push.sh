@@ -28,13 +28,8 @@ if [ "$1" == "" ]; then
     echo "Argument 1 variable REMOTE_IMAGE is not set, format: ezsystems/php. Bailing out !"
     exit 1
 fi
-if [ "$2" == "" ]; then
-    echo "Argument 2 variable FORMAT_VERSION is not set, format: v0 or v1 .. Bailing out !"
-    exit 1
-fi
 
 REMOTE_IMAGE="$1"
-FORMAT_VERSION="$2"
 PHP_VERSION=`docker -l error run ez_php:latest php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;"`
 
 docker images
@@ -47,8 +42,10 @@ docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}"
 docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-dev"
 
 # "7.0-v0"
-docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${FORMAT_VERSION}"
-docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-${FORMAT_VERSION}-dev"
+if [ "$2" != "" ]; then
+    docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${2}"
+    docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-${2}-dev"
+fi
 
 # "latest" (optional)
 if [ "$LATEST" == "$PHP_VERSION" ]; then
