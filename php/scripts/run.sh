@@ -50,19 +50,17 @@ if [ "$DEV_MODE" = "true" ]; then
         sudo -u ez mkdir -m 2775 web/var
     fi
 
-    echo "Clearing cache directories '$APP_FOLDER/cache/*/*' so new settings gets picked up"
+    echo "Clearing cache '$APP_FOLDER/cache/*/*' to make sure env variables are taken into account for settings"
     rm -Rf $APP_FOLDER/cache/*/*
 
-    if [ ! -d $APP_FOLDER/cache/$SYMFONY_ENV ]; then
-        echo "Creating cache folder for $SYMFONY_ENV as it was missing"
-        sudo -u ez mkdir -m 2775 $APP_FOLDER/cache/$SYMFONY_ENV
+    if [ -f auth.json ] || [ -f ${COMPOSER_HOME}/auth.json ]; then
+        echo "Making sure composer install is run for vendors, cache warmup and asset dump"
+        composer install --no-progress --no-interaction --prefer-dist
+    else
+        echo "WARNING: No auth.json in project dir or in composer home dir, skipping --dev-mode's composer install"
     fi
 
-    if [ "$SYMFONY_ENV" != "dev" ] && [ "$SYMFONY_ENV" != "" ]; then
-        echo "Re-generate symlink assets in case rsync was used so asstets added during setup wizards are reachable"
-        sudo -u ez php $APP_FOLDER/console assetic:dump
-    fi
-
+    # Will set ez as owner of the newly generated files
     /scripts/set_permissions.sh --dev
 else
     /scripts/set_permissions.sh
