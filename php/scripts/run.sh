@@ -53,12 +53,12 @@ if [ "$DEV_MODE" = "true" ]; then
     echo "Clearing cache '$APP_FOLDER/cache/*/*' to make sure env variables are taken into account for settings"
     rm -Rf $APP_FOLDER/cache/*/*
 
-    if [ -f auth.json ] || [ -f ${COMPOSER_HOME}/auth.json ]; then
-        echo "Making sure composer install is run for vendors, cache warmup and asset dump"
-        composer install --no-progress --no-interaction --prefer-dist
-    else
-        echo "WARNING: No auth.json in project dir or in composer home dir, skipping --dev-mode's composer install"
+    if [ ! -f auth.json ] && [ ! -f ${COMPOSER_HOME}/auth.json ]; then
+        echo "WARNING: No auth.json in project dir or in composer home dir, composer install might take longer or fail!"
     fi
+
+    echo "Making sure composer install is run for vendors, cache warmup and asset dump"
+    composer install --no-progress --no-interaction --prefer-dist
 
     # Will set ez as owner of the newly generated files
     /scripts/set_permissions.sh --dev
