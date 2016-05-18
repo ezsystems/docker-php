@@ -57,8 +57,8 @@ if [ "$DEV_MODE" = "true" ]; then
         echo "WARNING: No auth.json in project dir or in composer home dir, composer install might take longer or fail!"
     fi
 
-    echo "Making sure composer install is run for vendors, cache warmup and asset dump"
-    composer install --no-progress --no-interaction --prefer-dist
+    echo "Run composer post-install-cmd with correct env in case it changed; for cache clear/warmup & asset dump"
+    composer run-script --no-interaction post-install-cmd
 
     # Will set ez as owner of the newly generated files
     /scripts/set_permissions.sh --dev
