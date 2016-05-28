@@ -50,19 +50,13 @@ if [ "$DEV_MODE" = "true" ]; then
         sudo -u ez mkdir -m 2775 web/var
     fi
 
-    echo "Clearing cache '$APP_FOLDER/cache/*/*' to make sure env variables are taken into account for settings"
+    echo "Clearing cache '$APP_FOLDER/cache/*/*' to make sure env variables are taken into account for env settings"
     rm -Rf $APP_FOLDER/cache/*/*
-
-    if [ ! -f auth.json ] && [ ! -f ${COMPOSER_HOME}/auth.json ]; then
-        echo "WARNING: No auth.json in project dir or in composer home dir, composer install might take longer or fail!"
-    fi
-
-    echo "Run composer post-install-cmd with correct env in case it changed; for cache clear/warmup & asset dump"
-    composer run-script --no-interaction post-install-cmd
 
     # Will set ez as owner of the newly generated files
     /scripts/set_permissions.sh --dev
 else
+    # Todo: Remove, should not be needed in prod where permissions are set on image (but depends on removal of ez user)
     /scripts/set_permissions.sh
 fi
 
