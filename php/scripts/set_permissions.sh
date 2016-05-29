@@ -123,8 +123,17 @@ set_permissions_www_data()
         sudo -u ez mkdir -m 2775 web/var
     fi
 
-    setfacl -R -m u:www-data:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs web/var
-    setfacl -dR -m u:www-data:rwX -m u:ez:rwX ${APP_FOLDER}/cache ${APP_FOLDER}/logs web/var
+    # Support for cache and log dur being set by env variables (supported by Symfony kernel)
+    if [ "$SYMFONY__KERNEL__CACHE_DIR" = "" ]; then
+        SYMFONY__KERNEL__CACHE_DIR=${APP_FOLDER}/cache
+    fi
+
+    if [ "$SYMFONY__KERNEL__LOGS_DIR" = "" ]; then
+        SYMFONY__KERNEL__LOGS_DIR=${APP_FOLDER}/logs
+    fi
+
+    setfacl -R -m u:www-data:rwX -m u:ez:rwX ${SYMFONY__KERNEL__CACHE_DIR} ${SYMFONY__KERNEL__LOGS_DIR} web/var
+    setfacl -dR -m u:www-data:rwX -m u:ez:rwX ${SYMFONY__KERNEL__CACHE_DIR} ${SYMFONY__KERNEL__LOGS_DIR} web/var
 
     # eZ Publish 5.4 stuff
     if [ -d ezpublish/sessions ]; then
