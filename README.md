@@ -7,7 +7,7 @@ The Docker images here extends [official PHP images](https://hub.docker.com/_/ph
 
 ## Overview
 
-This is part of our [ez-docker-tools](https://github.com/ezsystems/docker-tools), currently in beta, and hence docker hub
+This is part of our eZ Docker- Tools, currently in alpha, and hence docker hub
 tags is in the format `ezsystems/php:7.0-v0`.
 
 Aim is to reach stable sometime in second half of 2016, after a periode of extensive testing and feedback by community and partners.
