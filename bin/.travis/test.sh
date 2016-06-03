@@ -37,7 +37,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     docker run -ti --rm \
       -e SYMFONY_ENV \
       -v $(pwd)/volumes/ezplatform:/var/www \
-      -v  $COMPOSER_HOME:/home/ez/.composer \
+      -v  $COMPOSER_HOME:/root/.composer \
       ez_php:latest \
       bash -c "composer create-project --no-dev --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www"
 fi
