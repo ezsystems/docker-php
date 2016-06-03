@@ -10,7 +10,7 @@ prevent_multiple_execution()
         echo "Script has already been executed. Bailling out"
         exit
     fi
-    sudo -u ez touch /tmp/prepare_distribution_already_run.txt
+    sudo touch /tmp/prepare_distribution_already_run.txt
 }
 
 # $1 is description

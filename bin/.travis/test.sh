@@ -34,10 +34,10 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     fi
 
     printf "\nBuilding on ez_php:latest, composer will implicit check requirements\n"
-    docker run -ti --rm --user=ez \
+    docker run -ti --rm \
       -e SYMFONY_ENV \
       -v $(pwd)/volumes/ezplatform:/var/www \
-      -v  $COMPOSER_HOME:/home/ez/.composer \
+      -v  $COMPOSER_HOME:/root/.composer \
       ez_php:latest \
       bash -c "composer create-project --no-dev --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www"
 fi
@@ -45,14 +45,14 @@ fi
 
 
 printf "\nMinimal testing on ez_php:latest for use with ez user"
-docker run -ti --rm --user=ez \
+docker run -ti --rm \
   -v $(pwd)/volumes/ezplatform:/var/www \
   -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
   ez_php:latest \
   bash -c "php testSymfonyRequirements.php"
 
 printf "\nMinimal testing on ez_php:latest-dev for use with ez user"
-docker run -ti --rm --user=ez \
+docker run -ti --rm \
   -v $(pwd)/volumes/ezplatform:/var/www \
   -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
   ez_php:latest-dev \

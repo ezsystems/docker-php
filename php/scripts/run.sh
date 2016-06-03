@@ -38,26 +38,13 @@ if [ "$EZ_KICKSTART_TEMPLATE" != "" ]; then
 fi
 
 if [ "$DEV_MODE" = "true" ]; then
-    APP_FOLDER="app"
-
-    # EZP5: By default app folder is "app", but "ezpublish" is selected if found for bc.
-    if [ -d ezpublish ]; then
-        APP_FOLDER="ezpublish"
-    fi
-
     if [ ! -d web/var ]; then
         echo "Creating web/var as it was missing"
-        sudo -u ez mkdir -m 2775 web/var
+        mkdir -m 2775 web/var && chown www-data -R web/var
     fi
 
-    echo "Clearing cache '$APP_FOLDER/cache/*/*' to make sure env variables are taken into account for env settings"
-    rm -Rf $APP_FOLDER/cache/*/*
-
-    # Will set ez as owner of the newly generated files
-    /scripts/set_permissions.sh --dev
-else
-    # Todo: Remove, should not be needed in prod where permissions are set on image (but depends on removal of ez user)
-    /scripts/set_permissions.sh
+    # Needed for docker-machine
+    usermod -u 1000 www-data
 fi
 
 # Start php-fpm
