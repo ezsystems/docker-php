@@ -43,8 +43,7 @@ if [ "$DEV_MODE" = "true" ]; then
         mkdir -m 2775 web/var && chown www-data -R web/var
     fi
 
-    # Needed for docker-machine
-    usermod -u 1000 www-data
+    # TODO: for prod pick opcache settings that don't check php file changes.
 fi
 
 # Start php-fpm
