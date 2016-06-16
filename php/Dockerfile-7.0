@@ -13,7 +13,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     MEMORY_LIMIT=256M \
     MAX_EXECUTION_TIME=90 \
     PORT=9000 \
-    COMPOSER_HOME=/root/.composer
+    COMPOSER_HOME=/root/.composer \
+    PHPREDIS_VERSION=3.0.0
 
 ## Get packages
 ### unzip needed due to https://github.com/composer/composer/issues/4471
@@ -39,6 +40,13 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
  && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
  && docker-php-ext-enable opcache
+
+# install phpredis extension
+RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/$PHPREDIS_VERSION.tar.gz \
+    && tar xfz /tmp/redis.tar.gz \
+    && rm -r /tmp/redis.tar.gz \
+    && mv phpredis-$PHPREDIS_VERSION /usr/src/php/ext/redis \
+    && docker-php-ext-install redis
 
 # Set timezone
 RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
