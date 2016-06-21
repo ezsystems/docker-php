@@ -43,7 +43,14 @@ if [ "$DEV_MODE" = "true" ]; then
         mkdir -m 2775 web/var && chown www-data -R web/var
     fi
 
-    # TODO: for prod pick opcache settings that don't check php file changes.
+    echo "Deleting container to make sure environment variables are picked up"
+    if [ -d bin/cache ]; then
+        rm bin/cache/*/*ProjectContainer.php
+    elif [ -d ezpublish/cache ]; then
+        rm ezpublish/cache/*/*ProjectContainer.php
+    else
+        rm app/cache/*/*ProjectContainer.php
+    fi
 fi
 
 # Start php-fpm
