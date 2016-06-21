@@ -51,6 +51,8 @@ if [ "$DEV_MODE" = "true" ]; then
     else
         rm app/cache/*/*ProjectContainer.php
     fi
+else
+    sed -i "s@;opcache.validate_timestamps=0@opcache.validate_timestamps=0@" ${PHP_INI_DIR}/conf.d/php.ini
 fi
 
 # Start php-fpm
