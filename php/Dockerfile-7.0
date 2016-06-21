@@ -62,6 +62,7 @@ RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
     && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
+
 COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 
 # Add pid file to be able to restart php-fpm
@@ -80,6 +81,9 @@ COPY scripts /scripts
 COPY config/php.ini ${PHP_INI_DIR}/conf.d/php.ini
 
 RUN chmod 755 /scripts/*.sh
+
+# Needed for docker-machine
+RUN usermod -u 1000 www-data
 
 WORKDIR /var/www
 
