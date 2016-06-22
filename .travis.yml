@@ -10,7 +10,7 @@ env:
   global:
     - REMOTE_IMAGE="ezsystems/php"
     - LATEST="7.0"
-    - FORMAT_VERSION="v0"
+    - FORMAT_VERSION="v1"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
     - PHP_VERSION="5.5"
@@ -25,6 +25,7 @@ before_script:
 script: bin/.travis/test.sh
 
 after_success: if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${FORMAT_VERSION}; fi
+after_failure: if [ -d volumes/ezplatform ]; then cd volumes/ezplatform; docker-compose logs; fi
 
 # test only master (+ Pull requests)
 branches:

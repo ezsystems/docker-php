@@ -74,12 +74,13 @@ docker run --rm mycompany/myapp_volume app/console list
 
 ### Development use
 
-*Warning: As of May 2016, avoid using Docker for Mac beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not opn Linux, and when using what Docker calls host mounted volumes.*
+*Warning: As of May 2016, avoid using Docker for Mac beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not on Linux, and when using what Docker calls host mounted volumes.*
 
 To get started, lets set permissions for dev use, and make sure to install composer packages:
 ```bash
-sudo find {app/{cache,logs},web} -type d | xargs sudo chmod -R 777
-sudo find {app/{cache,logs},web} -type f | xargs sudo chmod -R 666
+sudo mkdir -p web/var
+sudo find {app/{cache,logs},web/var} -type d | xargs sudo chmod -R 777
+sudo find {app/{cache,logs},web/var} -type f | xargs sudo chmod -R 666
 docker run --rm -u www-data -v `pwd`:/var/www -e SYMFONY_ENV=dev ezsystems/php:7.0-v0 composer install --no-progress --no-interaction --prefer-dist
 ```
 
