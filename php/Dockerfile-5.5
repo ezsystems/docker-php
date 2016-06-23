@@ -57,6 +57,9 @@ RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
 
 COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 
+# Install Redis, using pecl to always get latest relevant version.
+RUN yes | pecl install redis
+
 # Add pid file to be able to restart php-fpm
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
