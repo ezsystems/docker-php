@@ -41,13 +41,6 @@ RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
  && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
  && docker-php-ext-enable opcache
 
-# install phpredis extension
-RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/$PHPREDIS_VERSION.tar.gz \
-    && tar xfz /tmp/redis.tar.gz \
-    && rm -r /tmp/redis.tar.gz \
-    && mv phpredis-$PHPREDIS_VERSION /usr/src/php/ext/redis \
-    && docker-php-ext-install redis
-
 # Set timezone
 RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
@@ -64,6 +57,9 @@ RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
     && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
 
 COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
+
+# Install Redis, using pecl to avoid some issues with manual downloads.
+RUN yes | pecl install redis-$PHPREDIS_VERSION
 
 # Add pid file to be able to restart php-fpm
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
