@@ -67,7 +67,6 @@ export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/seleniu
 git clone --depth 1 --single-branch --branch master https://github.com/ezsystems/ezplatform.git
 cd ezplatform
 
-echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > auth.json
 docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
 
 docker-compose up -d
