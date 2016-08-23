@@ -63,7 +63,7 @@ docker run -ti --rm \
 
 
 printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform"
-export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="1" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="1" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
 git clone --depth 1 --single-branch --branch master https://github.com/ezsystems/ezplatform.git
 cd ezplatform
 
