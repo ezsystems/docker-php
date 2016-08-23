@@ -51,6 +51,8 @@ docker run -ti --rm \
   ez_php:latest \
   bash -c "php testSymfonyRequirements.php"
 
+
+
 printf "\nMinimal testing on ez_php:latest-dev for use with ez user"
 docker run -ti --rm \
   -v $(pwd)/volumes/ezplatform:/var/www \
@@ -59,12 +61,15 @@ docker run -ti --rm \
   bash -c "php testSymfonyRequirements.php"
 
 
-printf "\nDetached testing on ez_php:latest with nginx"
-docker run -d -v $(pwd)/volumes/ezplatform:/var/www --name ezphp ez_php:latest
-docker exec -it ezphp php -v
-#docker inspect --format '{{ .NetworkSettings.IPAddress }}' ezphp
-# TODO: Run behat suite with defaults? Maybe when we have verified that it works with sqlite and
-# TODO: php-internal-web-server, to avoid pulling in full docker-compose setup.
-#       however like partially done here we need to make sure run.sh gets coverage
-docker stop ezphp
-docker rm ezphp
+
+printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform"
+export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="1" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+git clone --depth 1 --single-branch --branch master https://github.com/ezsystems/ezplatform.git
+cd ezplatform
+
+echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > auth.json
+docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
+
+docker-compose up -d
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/behat -vv --profile=rest --suite=fullJson --tags=~@broken"
+docker-compose down -v
