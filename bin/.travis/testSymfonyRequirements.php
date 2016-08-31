@@ -7,7 +7,9 @@ require_once dirname(__FILE__) . '/app/SymfonyRequirements.php';
 $symfonyRequirements = new SymfonyRequirements();
 
 $majorProblems = $symfonyRequirements->getFailedRequirements();
-$minorProblems = $symfonyRequirements->getFailedRecommendations();
+
+// Skip temporarily while ICU is an issue: https://github.com/sensiolabs/SensioDistributionBundle/issues/277
+//$minorProblems = $symfonyRequirements->getFailedRecommendations();
 
 $error = false;
 
