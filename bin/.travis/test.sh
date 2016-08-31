@@ -63,12 +63,10 @@ docker run -ti --rm \
 
 
 printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform"
+cd volumes/ezplatform
 export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="1" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
-git clone --depth 1 --single-branch --branch master https://github.com/ezsystems/ezplatform.git
-cd ezplatform
-
 docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
 
 docker-compose up -d
-docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/behat -vv --profile=rest --suite=fullJson --tags=~@broken"
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/behat -vv --profile=platformui --tags='@common'"
 docker-compose down -v
