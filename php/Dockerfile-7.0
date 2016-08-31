@@ -35,18 +35,12 @@ RUN apt-get update -q -y \
         && rm -rf /var/lib/apt/lists/*
 
 # Install and configure php plugins
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+RUN docker-php-source extract \
+ && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
  && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
  && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
  && docker-php-ext-enable opcache
-
-# install phpredis extension
-RUN curl -L -o /tmp/redis.tar.gz https://github.com/phpredis/phpredis/archive/$PHPREDIS_VERSION.tar.gz \
-    && tar xfz /tmp/redis.tar.gz \
-    && rm -r /tmp/redis.tar.gz \
-    && mv phpredis-$PHPREDIS_VERSION /usr/src/php/ext/redis \
-    && docker-php-ext-install redis
 
 # Set timezone
 RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
@@ -59,20 +53,22 @@ RUN cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
 
 ## Install blackfire: https://blackfire.io/docs/integrations/docker
 RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
-    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
-    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
-    && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
+ && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
+ && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+ && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
 
 COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
+
+# Install Redis, using pecl to avoid some issues with manual downloads.
+RUN yes | pecl install redis-$PHPREDIS_VERSION \
+ && docker-php-source delete
 
 # Add pid file to be able to restart php-fpm
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
-# Create Composer directory (cache and auth files)
-RUN mkdir -p $COMPOSER_HOME
-
-# Get Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Create Composer directory (cache and auth files) & Get Composer
+RUN mkdir -p $COMPOSER_HOME \
+ && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # As application is put in as volume we do all needed operation on run
 COPY scripts /scripts
