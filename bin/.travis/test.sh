@@ -5,6 +5,7 @@ set -e
 # - ez_php:latest
 # - ez_php:latest-dev
 REUSE_VOLUME=0
+PLATFORM_VERSION="@rc"
 
 ## Parse arguments
 for i in "$@"; do
@@ -12,8 +13,11 @@ case $i in
     --reuse-volume)
         REUSE_VOLUME=1
         ;;
+    --platform-version=*)
+        PLATFORM_VERSION="${i#*=}"
+        ;;
     *)
-        printf "Not recognised argument: ${i}, only supported argument is: --reuse-volume"
+        printf "Not recognised argument: ${i}, only supported arguments are: --reuse-volume & --platform-version=@rc"
         exit 1
         ;;
 esac
@@ -39,7 +43,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
       -v $(pwd)/volumes/ezplatform:/var/www \
       -v  $COMPOSER_HOME:/root/.composer \
       ez_php:latest \
-      bash -c "composer create-project --no-dev --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www"
+      bash -c "composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $PLATFORM_VERSION"
 fi
 
 
