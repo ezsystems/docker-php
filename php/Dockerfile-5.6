@@ -18,6 +18,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 ## Get packages
 ### unzip needed due to https://github.com/composer/composer/issues/4471
+# @todo: split out builds deps and purge those after build like:
+# https://github.com/docker-library/php/blob/master/7.0/Dockerfile
 RUN apt-get update -q -y \
  && apt-get install -q -y --force-yes --no-install-recommends \
         libfreetype6-dev \
@@ -40,31 +42,32 @@ RUN docker-php-source extract \
  && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
  && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
  && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
- && docker-php-ext-enable opcache
+ && docker-php-ext-enable opcache \
+ && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
+ \
+ # Install blackfire: https://blackfire.io/docs/integrations/docker
+ && export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
+ && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
+ && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+ && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so \
+ && rm -f /tmp/blackfire-probe.tar.gz \
+ \
+ # Install redis
+ && yes | pecl install redis-$PHPREDIS_VERSION \
+ \
+ # Delete source in same layer so it does not hang aorund in layers
+ && docker-php-source delete
 
 # Set timezone
 RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# Set some php.ini config
-RUN cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
- && echo "date.timezone = $TIMEZONE" >> ${PHP_INI_DIR}/php.ini \
+# Set some php config
+RUN echo "date.timezone = $TIMEZONE" >> ${PHP_INI_DIR}/php.ini \
  && echo "memory_limit = $MEMORY_LIMIT" >> ${PHP_INI_DIR}/php.ini \
- && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini
-
-## Install blackfire: https://blackfire.io/docs/integrations/docker
-RUN export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
- && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
- && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
- && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so
+ && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini \
+ && sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
 COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
-
-# Install Redis, using pecl to avoid some issues with manual downloads.
-RUN yes | pecl install redis-$PHPREDIS_VERSION \
- && docker-php-source delete
-
-# Add pid file to be able to restart php-fpm
-RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
 # Create Composer directory (cache and auth files) & Get Composer
 RUN mkdir -p $COMPOSER_HOME \
