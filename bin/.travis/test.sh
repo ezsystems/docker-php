@@ -68,5 +68,5 @@ export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.y
 docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
 
 docker-compose up -d
-docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/behat -vv --profile=platformui --tags='@common'"
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -vv --profile=platformui --tags='@common'"
 docker-compose down -v
