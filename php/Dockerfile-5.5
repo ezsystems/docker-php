@@ -7,13 +7,7 @@ FROM php:5.5-fpm
 # - (bash|php|composer) Allows to execute composer, php or bash against the image
 
 # Set defaults for variables used by run.sh
-# If you change MAX_EXECUTION TIME, also change fastcgi_read_timeout accordingly in nginx!
-ENV DEBIAN_FRONTEND=noninteractive \
-    TIMEZONE=UTC \
-    MEMORY_LIMIT=256M \
-    MAX_EXECUTION_TIME=90 \
-    PORT=9000 \
-    COMPOSER_HOME=/root/.composer \
+ENV COMPOSER_HOME=/root/.composer \
     PHPREDIS_VERSION=2.2.8
 
 # Get packages that we need in container
@@ -65,15 +59,12 @@ RUN set -xe \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
 
 # Set timezone
-RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# Set some php config
-RUN echo "date.timezone = $TIMEZONE" >> ${PHP_INI_DIR}/php.ini \
-    && echo "memory_limit = $MEMORY_LIMIT" >> ${PHP_INI_DIR}/php.ini \
-    && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini \
-    && sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
+# Set pid file to be able to restart php-fpm
+RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
-COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
+COPY conf.d/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 
 # Create Composer directory (cache and auth files) & Get Composer
 RUN mkdir -p $COMPOSER_HOME \
@@ -83,7 +74,7 @@ RUN mkdir -p $COMPOSER_HOME \
 COPY scripts /scripts
 
 # Add some custom config
-COPY config/php.ini ${PHP_INI_DIR}/conf.d/php.ini
+COPY conf.d/php.ini ${PHP_INI_DIR}/conf.d/php.ini
 
 RUN chmod 755 /scripts/*.sh
 

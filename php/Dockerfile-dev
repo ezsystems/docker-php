@@ -12,4 +12,4 @@ RUN apt-get update -q -y \
 
 # Install xdebug
 RUN yes | pecl install xdebug
-COPY config/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini
+COPY conf.d/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini
