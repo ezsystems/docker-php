@@ -1,83 +1,87 @@
 FROM php:5.5-fpm
 
-# Container containing php-fpm and php-cli to run and interact with eZ Platform
+# Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #
 # It has two modes of operation:
-# - (default run.sh cmd) Reconfigure eZ Platform/Publish based on provided env variables and start php-fpm
+# - (run.sh cmd) [default] Reconfigure eZ Platform/Publish based on provided env variables and start php-fpm
 # - (bash|php|composer) Allows to execute composer, php or bash against the image
 
 # Set defaults for variables used by run.sh
-# If you change MAX_EXECUTION TIME, also change fastcgi_read_timeout accordingly in nginx!
-ENV DEBIAN_FRONTEND=noninteractive \
-    TIMEZONE=UTC \
-    MEMORY_LIMIT=256M \
-    MAX_EXECUTION_TIME=90 \
-    PORT=9000 \
-    COMPOSER_HOME=/root/.composer \
+ENV COMPOSER_HOME=/root/.composer \
     PHPREDIS_VERSION=2.2.8
 
-## Get packages
-### unzip needed due to https://github.com/composer/composer/issues/4471
-# @todo: split out builds deps and purge those after build like:
-# https://github.com/docker-library/php/blob/master/7.0/Dockerfile
+# Get packages that we need in container
 RUN apt-get update -q -y \
- && apt-get install -q -y --force-yes --no-install-recommends \
+    && apt-get install -q -y --force-yes --no-install-recommends \
+        ca-certificates \
+        curl \
+        acl \
+        sudo \
+# Needed for the php extensions we enable below
+        libfreetype6 \
+        libjpeg62-turbo \
+        libxpm4 \
+        libpng12-0 \
+        libicu52 \
+        libxslt1.1 \
+# git & unzip needed for composer, unless we document to use dev image for composer install
+# unzip needed due to https://github.com/composer/composer/issues/4471
+        unzip \
+        git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install and configure php plugins
+RUN set -xe \
+    && buildDeps=" \
+        $PHP_EXTRA_BUILD_DEPS \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libxpm-dev \
         libpng12-dev \
         libicu-dev \
         libxslt1-dev \
-        ca-certificates \
-        curl \
-        acl \
-        sudo \
-        unzip \
-        git \
-        && rm -rf /var/lib/apt/lists/*
-
-# Install and configure php plugins
-RUN docker-php-source extract \
- && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
- && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
- && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
- && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
- && docker-php-ext-enable opcache \
- && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
- \
- # Install blackfire: https://blackfire.io/docs/integrations/docker
- && export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
- && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
- && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
- && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so \
- && rm -f /tmp/blackfire-probe.tar.gz \
- \
- # Install redis
- && yes | pecl install redis-$PHPREDIS_VERSION \
- \
- # Delete source in same layer so it does not hang aorund in layers
- && docker-php-source delete
+    " \
+	&& apt-get update && apt-get install -y --force-yes $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+# Extract php source and install missing extensions
+    && docker-php-source extract \
+    && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
+    && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
+    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
+    && docker-php-ext-enable opcache \
+    && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
+    \
+# Install blackfire: https://blackfire.io/docs/integrations/docker
+    && export VERSION=`php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;"` \
+    && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/${VERSION} \
+    && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp \
+    && mv /tmp/blackfire-*.so `php -r "echo ini_get('extension_dir');"`/blackfire.so \
+    && rm -f /tmp/blackfire-probe.tar.gz \
+    \
+# Install redis
+    && yes | pecl install redis-$PHPREDIS_VERSION \
+    \
+# Delete source & builds deps so it does not hang around in layers taking up space
+    && docker-php-source delete \
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
 
 # Set timezone
-RUN echo $TIMEZONE > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# Set some php config
-RUN echo "date.timezone = $TIMEZONE" >> ${PHP_INI_DIR}/php.ini \
- && echo "memory_limit = $MEMORY_LIMIT" >> ${PHP_INI_DIR}/php.ini \
- && echo "max_execution_time = $MAX_EXECUTION_TIME" >> ${PHP_INI_DIR}/php.ini \
- && sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
+# Set pid file to be able to restart php-fpm
+RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
-COPY config/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
+COPY conf.d/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 
 # Create Composer directory (cache and auth files) & Get Composer
 RUN mkdir -p $COMPOSER_HOME \
- && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # As application is put in as volume we do all needed operation on run
 COPY scripts /scripts
 
 # Add some custom config
-COPY config/php.ini ${PHP_INI_DIR}/conf.d/php.ini
+COPY conf.d/php.ini ${PHP_INI_DIR}/conf.d/php.ini
 
 RUN chmod 755 /scripts/*.sh
 
