@@ -68,7 +68,7 @@ cd volumes/ezplatform
 # Tag image as eZ Platform extends this exact image our and we don't want it to pull in remote
 docker tag ez_php:latest "ezsystems/php:7.0-v0"
 
-export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="1" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
 docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
 
 docker-compose up -d
