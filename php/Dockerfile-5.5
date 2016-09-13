@@ -60,6 +60,7 @@ RUN set -xe \
     \
 # Install redis
     && yes | pecl install redis-$PHPREDIS_VERSION \
+    && echo "extension=redis.so" > ${PHP_INI_DIR}/conf.d/redis.ini \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
     && docker-php-source delete \
