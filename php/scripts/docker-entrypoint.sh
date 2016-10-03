@@ -12,26 +12,26 @@ set -e
 
 ## Clear container on start by default
 if [ "$NO_FORCE_SF_CONTAINER_REFRESH" != "" ]; then
-    echo "NO_FORCE_SF_CONTAINER_REFRESH set, skipping Symfony container clearing on startup."
+    logger "NO_FORCE_SF_CONTAINER_REFRESH set, skipping Symfony container clearing on startup."
 elif [ -d var/cache ]; then
-    echo "Symfony 3.x structure detected, container is not cleared on startup, use 3.2+ env variables support and warmup container during build."
+    logger "Symfony 3.x structure detected, container is not cleared on startup, use 3.2+ env variables support and warmup container during build."
 elif [ -d ezpublish/cache ]; then
-    echo "Deleting ezpublish/cache/*/*ProjectContainer.php to make sure environment variables are picked up"
+    logger "Deleting ezpublish/cache/*/*ProjectContainer.php to make sure environment variables are picked up"
     rm -f ezpublish/cache/*/*ProjectContainer.php
 elif [ -d app/cache ]; then
-    echo "Deleting app/cache/*/*ProjectContainer.php to make sure environment variables are picked up"
+    logger "Deleting app/cache/*/*ProjectContainer.php to make sure environment variables are picked up"
     rm -f app/cache/*/*ProjectContainer.php
 fi
 
 ## Adjust behat.yml if asked for from localhost setup to use defined hosts
 if [ "$BEHAT_SELENIUM_HOST" != "" ] && [ "$BEHAT_WEB_HOST" != "" ]; then
-    echo "Copying behat.yml.dist to behat.yml and updating selenium and web hosts"
+    logger "Copying behat.yml.dist to behat.yml and updating selenium and web hosts"
     if [ -f behat.yml.dist ]; then
         cp -f behat.yml.dist behat.yml
         sed -i "s@localhost:4444@${BEHAT_SELENIUM_HOST}:4444@" behat.yml
         sed -i "s@localhost@${BEHAT_WEB_HOST}@" behat.yml
     else
-        echo "No behat.yml.dist found, skipping"
+        logger "No behat.yml.dist found, skipping"
     fi
 fi
 
@@ -39,10 +39,10 @@ fi
 ## Auto adjust log folder for xdebug if enabled
 if [ ! -d app ] && [ -f ${PHP_INI_DIR}/conf.d/xdebug.ini ]; then
     if [ -d ezpublish/log ]; then
-        echo "Auto adjusting xdebug settings to log in ezpublish/log"
+        logger "Auto adjusting xdebug settings to log in ezpublish/log"
         sed -i "s@/var/www/app/log@/var/www/ezpublish/log@" ${PHP_INI_DIR}/conf.d/xdebug.ini
     elif [ -d var/log ]; then
-        echo "Auto adjusting xdebug settings to log in var/log"
+        logger "Auto adjusting xdebug settings to log in var/log"
         sed -i "s@/var/www/app/log@/var/www/var/log@" ${PHP_INI_DIR}/conf.d/xdebug.ini
     fi
 fi
@@ -51,11 +51,10 @@ fi
 # extend behaviour without modifying this file.
 for f in /docker-entrypoint-initdb.d/*; do
     case "$f" in
-        *.sh)     echo "$0: running $f"; . "$f" ;;
+        *.sh)     logger "$0: running $f"; . "$f" ;;
         "/docker-entrypoint-initdb.d/*") ;;
-        *)        echo "$0: ignoring $f" ;;
+        *)        logger "$0: ignoring $f" ;;
     esac
-    echo
 done
 
 
