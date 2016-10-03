@@ -8,10 +8,6 @@ set -e
 
 validateEnvironment()
 {
-    if [ "$DOCKER_EMAIL" = "" ]; then
-        echo "Environment variable DOCKER_EMAIL is not set. Bailing out !"
-        exit 1
-    fi
     if [ "$DOCKER_USERNAME" = "" ]; then
         echo "Environment variable DOCKER_USERNAME is not set. Bailing out !"
         exit 1
@@ -33,7 +29,7 @@ REMOTE_IMAGE="$1"
 PHP_VERSION=`docker -l error run ez_php:latest php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;"`
 
 docker images
-docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 ## TAGS
 
