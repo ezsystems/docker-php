@@ -32,6 +32,7 @@ docker images
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 
 ## TAGS
+echo "About to tag remote image '${REMOTE_IMAGE}' with php version '${PHP_VERSION}'"
 
 # "7.0"
 docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}"
