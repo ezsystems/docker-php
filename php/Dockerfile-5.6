@@ -91,6 +91,8 @@ RUN usermod -u 1000 www-data
 
 WORKDIR /var/www
 
-CMD /scripts/run.sh --dev-mode
+ENTRYPOINT ["/scripts/docker-entrypoint.sh"]
+
+CMD php-fpm
 
 EXPOSE 9000
