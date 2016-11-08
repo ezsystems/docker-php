@@ -8,6 +8,7 @@ RUN apt-get update -q -y \
         vim \
         wget \
         tree \
+        gdb-minimal \
         && rm -rf /var/lib/apt/lists/*
 
 # Install xdebug
