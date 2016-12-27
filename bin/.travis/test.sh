@@ -27,6 +27,11 @@ if [ "$FORMAT_VERSION" = "" ]; then
     FORMAT_VERSION="v1"
 fi
 
+if [ "$EZ_VERSION" = "" ]; then
+    EZ_VERSION="@alpha"
+fi
+
+
 if [ "$REUSE_VOLUME" = "0" ]; then
     printf "\n(Re-)Creating volumes/ezplatform for fresh checkout, needs sudo to delete old and chmod new folder\n"
     sudo rm -Rf volumes/ezplatform
@@ -43,7 +48,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
       -v $(pwd)/volumes/ezplatform:/var/www \
       -v  $COMPOSER_HOME:/root/.composer \
       ez_php:latest \
-      bash -c "composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www @alpha"
+      bash -c "composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
 fi
 
 
