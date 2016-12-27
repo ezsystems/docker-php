@@ -7,8 +7,7 @@ FROM php:7.0-fpm
 # - (bash|php|composer) Allows to execute composer, php or bash against the image
 
 # Set defaults for variables used by run.sh
-ENV COMPOSER_HOME=/root/.composer \
-    PHPREDIS_VERSION=3.0.0
+ENV COMPOSER_HOME=/root/.composer
 
 # Get packages that we need in container
 RUN apt-get update -q -y \
@@ -59,7 +58,7 @@ RUN set -xe \
     && rm -f /tmp/blackfire-probe.tar.gz \
     \
 # Install redis
-    && yes | pecl install redis-$PHPREDIS_VERSION \
+    && yes | pecl install redis \
     && echo "extension=redis.so" > ${PHP_INI_DIR}/conf.d/redis.ini \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
