@@ -20,15 +20,16 @@ PHP image that aims to technically support running:
 ## Images
 
 This repository contains several images for different versions of PHP\*:
-- [7.0](php/Dockerfile-7.0) *(Will become the recommend version)*
+- [7.1](php/Dockerfile-7.1) *(Recommended version for testing newest versions of eZ Platform)*
+- [7.0](php/Dockerfile-7.0)
 - [5.6](php/Dockerfile-5.6)
-- [5.5](php/Dockerfile-5.5) *(EOL, so only meant for compatibility testing for maintenance releases)*
+- [5.5](php/Dockerfile-5.5) *(EOL, so only meant for compatibility testing for older maintenance releases)*
 
 -\* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 
 ### Dev image
 
-For each php version there is an addtional `-dev` flavour with addtional tools for when you need to be able to login and work towards the installation. It contains tools like vim, git, xdebug, ... [and others](php/Dockerfile-dev).
+For each php version there is an additional `-dev` flavour with additional tools for when you need to be able to login and work towards the installation. It contains tools like vim, git, xdebug, ... [and others](php/Dockerfile-dev).
 
 
 ### Format version
@@ -74,7 +75,7 @@ docker run --rm mycompany/myapp_volume app/console list
 
 ### Development use
 
-*Warning: As of May 2016, avoid using Docker for Mac beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not on Linux, and when using what Docker calls host mounted volumes.*
+*Warning: As of December 2016, avoid using Docker for Mac beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not on Linux, and when using what Docker calls host mounted volumes.*
 
 To get started, lets set permissions for dev use, and make sure to install composer packages:
 ```bash
