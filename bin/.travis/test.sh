@@ -27,6 +27,11 @@ if [ "$FORMAT_VERSION" = "" ]; then
     FORMAT_VERSION="v1"
 fi
 
+if [ "$EZ_VERSION" = "" ]; then
+    EZ_VERSION="@alpha"
+fi
+
+
 if [ "$REUSE_VOLUME" = "0" ]; then
     printf "\n(Re-)Creating volumes/ezplatform for fresh checkout, needs sudo to delete old and chmod new folder\n"
     sudo rm -Rf volumes/ezplatform
@@ -43,7 +48,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
       -v $(pwd)/volumes/ezplatform:/var/www \
       -v  $COMPOSER_HOME:/root/.composer \
       ez_php:latest \
-      bash -c "composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www @alpha"
+      bash -c "composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
 fi
 
 
@@ -75,7 +80,7 @@ docker tag ez_php:latest "ezsystems/php:7.0-${FORMAT_VERSION}"
 export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
 docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
 
-docker-compose up -d
+docker-compose up -d --build --force-recreate
 docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -vv --profile=platformui --tags='@common'"
 docker-compose down -v
 
