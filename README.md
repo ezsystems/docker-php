@@ -14,7 +14,7 @@ The Docker images here extends [official PHP images](https://hub.docker.com/_/ph
 PHP image that aims to technically support running:
 - eZ Platform
 - eZ Studio
-- eZ Publish 5.4 *(might not be officially supported for php7, will either way require latest version)*
+- eZ Publish 5.4 *(might not be officially supported for php7, will either way require latest 5.4.x version)*
 - Symfony *(As in any symfony-standard like app that have same or less requirements then eZ Platform)*
 
 ## Images
@@ -25,7 +25,7 @@ This repository contains several images for different versions of PHP\*:
 - [5.6](php/Dockerfile-5.6)
 - [5.5](php/Dockerfile-5.5) *(EOL, so only meant for compatibility testing for older maintenance releases)*
 
--\* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
+\* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 
 ### Dev image
 
@@ -34,7 +34,7 @@ For each php version there is an additional `-dev` flavour with additional tools
 
 ### Format version
 
-To be able to improve the image in the future, we have added a format version number that we will increase on future changes *(for instance move to Alpine Linux)*. Current version number is `v0` signaling the image is in beta.
+To be able to improve the image in the future, we have added a format version number that we will increase on future changes *(for instance move to Alpine Linux)*.
 
 It is recommended to specificy a tag with this format version number in your Docker / docker-compose use to avoid breaks in your application.
 
@@ -46,15 +46,16 @@ allows you to use the same image across all whole DevOps life cycle *(dev, build
 
 Before you start, you can test the image to see if you get which php version it is running:
 ```bash
-docker run --rm ezsystems/php:7.0-v0 php -v
+docker run --rm ezsystems/php:7.1-v1 php -v
 ```
 
-This should result in something like:
+This should result in *something* like:
 ```
-PHP 7.0.6 (cli) (built: May  4 2016 04:48:45) ( NTS )
+PHP 7.1.0 (cli) (built: Dec 14 2016 15:01:30) ( NTS )
 Copyright (c) 1997-2016 The PHP Group
-Zend Engine v3.0.0, Copyright (c) 1998-2016 Zend Technologies
-    with blackfire v1.10.5, https://blackfire.io, by Blackfireio Inc.
+Zend Engine v3.1.0, Copyright (c) 1998-2016 Zend Technologies
+    with Zend OPcache v7.1.0, Copyright (c) 1999-2016, by Zend Technologies
+    with blackfire v1.14.1~linux-x64-non_zts71, https://blackfire.io, by Blackfireio Inc.
 ```
 
 ### Production use
@@ -75,7 +76,7 @@ docker run --rm mycompany/myapp_volume app/console list
 
 ### Development use
 
-*Warning: As of December 2016, avoid using Docker for Mac beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not on Linux, and when using what Docker calls host mounted volumes.*
+*Warning: As of December 2016, avoid using Docker for Mac/Windows beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not on Linux, and when using what Docker calls host mounted volumes.*
 
 To get started, lets set permissions for dev use, and make sure to install composer packages:
 ```bash
@@ -100,11 +101,10 @@ For setting up a full setup with database and so on, see [ezplatform:doc/docker-
 ## Roadmap for this PHP image
 
 - PHP plugins:
- - memcached; *once [stable for 7.0](https://github.com/php-memcached-dev/php-memcached/releases)* OR
- - redis/predis
+ - memcached; *once [stable for 7.x](https://github.com/php-memcached-dev/php-memcached/releases)* OR
  - pdo_pgsql + pdo_sqlite
 - env variable to set session handler, ...
-- Alpine Linux; *To drop image size, once all other official images exists with alpine flavours, and when blackfire supports it*
+- Alpine Linux; *To drop image size, assuming all other official images move to Alpine, incl when blackfire supports it.*
 
 ## Copyright & license
 Copyright [eZ Systems AS](http://ez.no/), for copyright and license details see provided LICENSE file.
