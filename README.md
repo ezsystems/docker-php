@@ -78,7 +78,7 @@ docker run --rm mycompany/myapp_volume app/console list
 
 *Warning: As of December 2016, avoid using Docker for Mac/Windows beta for this setup, as it's load times are typically 60-90 seconds because of IO issues way worse then what Virtualbox ever had when doing shared folder. Which is essentially what is being used here when not on Linux, and when using what Docker calls host mounted volumes.*
 
-To get started, lets set permissions for dev use, and make sure to install composer packages:
+To get started, lets set permissions for dev use _(Symfony 2.x structure reflected in example)_, and make sure to install composer packages:
 ```bash
 sudo mkdir -p web/var
 sudo find {app/{cache,logs},web/var} -type d | xargs sudo chmod -R 777
