@@ -58,7 +58,7 @@ RUN set -xe \
     && rm -f /tmp/blackfire-probe.tar.gz \
     \
 # Install redis
-    && yes | pecl install redis \
+    && yes | pecl install redis-rc \
     && echo "extension=redis.so" > ${PHP_INI_DIR}/conf.d/redis.ini \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
