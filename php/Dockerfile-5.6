@@ -61,6 +61,10 @@ RUN set -xe \
     && yes | pecl install redis \
     && echo "extension=redis.so" > ${PHP_INI_DIR}/conf.d/redis.ini \
     \
+# Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
+    && yes | pecl install memcached-2.2.0 \
+    && echo "extension=memcached.so" > ${PHP_INI_DIR}/conf.d/memcached.ini \
+    \
 # Delete source & builds deps so it does not hang around in layers taking up space
     && docker-php-source delete \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
