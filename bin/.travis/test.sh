@@ -73,7 +73,8 @@ printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with 
 cd volumes/ezplatform
 
 
-# Tag image as eZ Platform extends this exact image our and we don't want it to pull in remote
+# Tag image as eZ Platform extends on of these exact images and we don't want it to pull in remote
+docker tag ez_php:latest "ezsystems/php:7.1-${FORMAT_VERSION}"
 docker tag ez_php:latest "ezsystems/php:7.0-${FORMAT_VERSION}"
 
 
@@ -85,4 +86,5 @@ docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php
 docker-compose down -v
 
 # Remove custom tag
+docker rmi "ezsystems/php:7.1-${FORMAT_VERSION}"
 docker rmi "ezsystems/php:7.0-${FORMAT_VERSION}"
