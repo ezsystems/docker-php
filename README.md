@@ -101,7 +101,6 @@ For setting up a full setup with database and so on, see [ezplatform:doc/docker-
 ## Roadmap for this PHP image
 
 - PHP plugins:
- - memcached; *once [stable for 7.x](https://github.com/php-memcached-dev/php-memcached/releases)* OR
  - pdo_pgsql + pdo_sqlite
 - env variable to set session handler, ...
 - Alpine Linux; *To drop image size, assuming all other official images move to Alpine, incl when blackfire supports it.*
