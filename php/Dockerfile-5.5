@@ -23,6 +23,7 @@ RUN apt-get update -q -y \
         libpng12-0 \
         libicu52 \
         libxslt1.1 \
+        libmemcached11 \
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
@@ -39,6 +40,7 @@ RUN set -xe \
         libpng12-dev \
         libicu-dev \
         libxslt1-dev \
+        libmemcached-dev \
     " \
 	&& apt-get update && apt-get install -y --force-yes $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
@@ -58,11 +60,11 @@ RUN set -xe \
     && rm -f /tmp/blackfire-probe.tar.gz \
     \
 # Install redis
-    && yes | pecl install redis \
+    && pecl install redis \
     && echo "extension=redis.so" > ${PHP_INI_DIR}/conf.d/redis.ini \
     \
 # Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
-    && yes | pecl install memcached-2.2.0 \
+    && pecl install memcached-2.2.0 \
     && echo "extension=memcached.so" > ${PHP_INI_DIR}/conf.d/memcached.ini \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
