@@ -40,9 +40,8 @@ RUN set -xe \
         libpng12-dev \
         libicu-dev \
         libxslt1-dev \
-        libmemcached-dev \
     " \
-	&& apt-get update && apt-get install -y --force-yes $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y --force-yes $buildDeps libmemcached-dev --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
     && docker-php-source extract \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
