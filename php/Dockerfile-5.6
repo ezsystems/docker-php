@@ -64,7 +64,7 @@ RUN set -xe \
     && docker-php-ext-enable redis \
     \
 # Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
-    && pecl install memcached-2.2.0 \
+    && echo no | pecl install memcached-2.2.0 \
     && docker-php-ext-enable memcached \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
