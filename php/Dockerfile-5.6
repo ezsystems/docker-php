@@ -23,7 +23,7 @@ RUN apt-get update -q -y \
         libpng12-0 \
         libicu52 \
         libxslt1.1 \
-        libmemcached11 \
+        libmemcachedutil2 \
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
@@ -41,10 +41,6 @@ RUN set -xe \
         libicu-dev \
         libxslt1-dev \
         libmemcached-dev \
-    " \
-    && doNotUninstall=" \
-        libmemcached11 \
-        libmemcachedutil2 \
     " \
 	&& apt-get update && apt-get install -y --force-yes $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
@@ -65,15 +61,14 @@ RUN set -xe \
     \
 # Install redis
     && pecl install redis \
-    && echo "extension=redis.so" > ${PHP_INI_DIR}/conf.d/redis.ini \
+    && docker-php-ext-enable redis \
     \
 # Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
     && pecl install memcached-2.2.0 \
-    && echo "extension=memcached.so" > ${PHP_INI_DIR}/conf.d/memcached.ini \
+    && docker-php-ext-enable memcached \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
     && docker-php-source delete \
-    && apt-mark manual $doNotUninstall \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
 
 # Set timezone
