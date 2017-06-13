@@ -2,7 +2,12 @@
 
 echo ("Running testSymfonyRequirements.php...\n");
 
-require_once dirname(__FILE__) . '/app/SymfonyRequirements.php';
+// Symfony 2 or 3 structure?
+if (file_exists(dirname(__FILE__) . '/app/SymfonyRequirements.php')) {
+    require_once dirname(__FILE__) . '/app/SymfonyRequirements.php';
+} else {
+    require_once dirname(__FILE__) . '/var/SymfonyRequirements.php';
+}
 
 $symfonyRequirements = new SymfonyRequirements();
 

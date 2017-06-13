@@ -28,7 +28,8 @@ if [ "$FORMAT_VERSION" = "" ]; then
 fi
 
 if [ "$EZ_VERSION" = "" ]; then
-    EZ_VERSION="@alpha"
+    # pull in latests stable by default
+    EZ_VERSION=""
 fi
 
 
