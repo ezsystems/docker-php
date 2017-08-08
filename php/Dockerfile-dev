@@ -2,7 +2,7 @@ FROM ez_php
 
 # Add additional packages for dev use
 RUN apt-get update -q -y \
- && apt-get install -q -y --force-yes --no-install-recommends \
+ && apt-get install -q -y --no-install-recommends \
         less \
         mariadb-client \
         vim \
