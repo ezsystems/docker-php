@@ -57,5 +57,14 @@ for f in /docker-entrypoint-initdb.d/*; do
     esac
 done
 
+# Scan for environment variables prefixed with PHP_INI_ENV_ and inject those into ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini
+if [ -f ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini ]; then rm ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini; fi
+env | while IFS='=' read -r name value ; do
+  if (echo $name|grep -E "^PHP_INI_ENV">/dev/null); then
+    # remove PHP_INI_ENV_ prefix
+    name=`echo $name | cut -f 4- -d "_"`
+    echo $name=$value >> ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini
+  fi
+done
 
 exec "$@"
