@@ -1,20 +1,23 @@
-# PHP Docker image for use with eZ Platform
+# Example of PHP Docker image for use with eZ Platform
 
-> **Beta**: Instructions and Tools in this repository is currently in Beta for community testing & contribution, and might change without notice.
-> See [online Docker Tools documentation](https://doc.ez.no/display/DEVELOPER/Docker+Tools) for known issues and further information.
+> **Example/Internal**: Instructions and Tools in this repository is provided as an example, which you can take and customize to your needs if you want to. This is something we use activly internally for QA and Demo use, and thus might change without notice _(we version the images, but only latests version receives updates)_.
+> If you are looking to have a ready made Docker environment for local development see https://ezsystems.github.io/launchpad/
+> If you are looking for ready made, optimized, development and production hosted environment see [eZ Platform Cloud](https://ez.no/Blog/We-Are-Launching-eZ-Platform-Cloud-Speeding-Up-Development-of-Your-Projects)
 
 
-This Git repository contains source code for eZ Systems provided Docker PHP images [avaiable on Docker Hub](https://hub.docker.com/r/ezsystems/php/) that in the future will be supported and recommended by [eZ Systems](http://ez.no/) for use with [eZ Platform](http://ezplatform.com/) and [eZ Studio](http://ezstudio.com/).
+This Git repository contains source code for eZ Systems provided Docker PHP images [available on Docker Hub](https://hub.docker.com/r/ezsystems/php/).
 
-The Docker images here extends [official PHP images](https://hub.docker.com/_/php/) and includes php-cli, php-fpm, [composer](https://getcomposer.org/), [blackfire](https://blackfire.io/), tweaks and extensions for optimal use with any advance Symfony applications *(like eZ Platform and eZ Studio)*.
+The Docker images here extends [official PHP images](https://hub.docker.com/_/php/) and includes php-cli, php-fpm, [composer](https://getcomposer.org/), [blackfire](https://blackfire.io/), tweaks and extensions for optimal use with any advance Symfony applications *(like eZ Platform and eZ Platform EE)*.
+
+_NOTE: The images here, just like the official once they extend, are meant to follow Dockers 1 main process recommendation from Docker per image, adding additional services to the image is not recommended. If so start from scratch with something else._
 
 
 ## Overview
 
 PHP image that aims to technically support running:
 - eZ Platform
-- eZ Studio
-- eZ Publish 5.4 *(might not be officially supported for php7, will either way require latest 5.4.x version)*
+- eZ Platform EE
+- eZ Publish 5.4 *(latests 5.4.x version)*
 - Symfony *(As in any symfony-standard like app that have same or less requirements then eZ Platform)*
 
 ## Images
@@ -103,6 +106,7 @@ For setting up a full setup with database and so on, see [ezplatform:doc/docker-
 - PHP plugins:
  - pdo_pgsql + pdo_sqlite
 - env variable to set session handler, ...
+- Apache + mod_php variant
 - Alpine Linux; *To drop image size, assuming all other official images move to Alpine, incl when blackfire supports it.*
 
 ## Copyright & license
