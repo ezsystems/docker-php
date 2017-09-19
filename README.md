@@ -1,7 +1,9 @@
 # Example of PHP Docker image for use with eZ Platform
 
 > **Example/Internal**: Instructions and Tools in this repository is provided as an example, which you can take and customize to your needs if you want to. This is something we use activly internally for QA and Demo use, and thus might change without notice _(we version the images, but only latests version receives updates)_.
+>
 > If you are looking to have a ready made Docker environment for local development see https://ezsystems.github.io/launchpad/
+>
 > If you are looking for ready made, optimized, development and production hosted environment see [eZ Platform Cloud](https://ez.no/Blog/We-Are-Launching-eZ-Platform-Cloud-Speeding-Up-Development-of-Your-Projects)
 
 
@@ -9,7 +11,7 @@ This Git repository contains source code for eZ Systems provided Docker PHP imag
 
 The Docker images here extends [official PHP images](https://hub.docker.com/_/php/) and includes php-cli, php-fpm, [composer](https://getcomposer.org/), [blackfire](https://blackfire.io/), tweaks and extensions for optimal use with any advance Symfony applications *(like eZ Platform and eZ Platform EE)*.
 
-_NOTE: The images here, just like the official once they extend, are meant to follow Dockers 1 main process recommendation from Docker per image, adding additional services to the image is not recommended. If so start from scratch with something else._
+_NOTE: The images here, just like the official once they extend, are meant to follow Dockers 1 main process per container recommendation from Docker, adding additional services to the image is not recommended and probably won't work. If so start from scratch with something else instead of using this._
 
 
 ## Overview
