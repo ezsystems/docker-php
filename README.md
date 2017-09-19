@@ -2,7 +2,7 @@
 
 > **Example/Internal**: Instructions and Tools in this repository is provided as an example, which you can take and customize to your needs if you want to. This is something we use activly internally for QA and Demo use, and thus might change without notice _(we version the images, but only latests version receives updates)_.
 >
-> If you are looking to have a ready made Docker environment for local development see https://ezsystems.github.io/launchpad/
+> If you are looking to have a ready made Docker environment for local development see [eZ Launchpad](https://ezsystems.github.io/launchpad/)
 >
 > If you are looking for ready made, optimized, development and production hosted environment see [eZ Platform Cloud](https://ez.no/Blog/We-Are-Launching-eZ-Platform-Cloud-Speeding-Up-Development-of-Your-Projects)
 
