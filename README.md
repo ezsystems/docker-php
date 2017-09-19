@@ -100,7 +100,7 @@ docker run --rm -u www-data -v `pwd`:/var/www -e SYMFONY_ENV=dev ezsystems/php:7
 
 ### Use with full setup (database, ..)
 
-For setting up a full setup with database and so on, see [ezplatform:doc/docker-compose](https://github.com/ezsystems/ezplatform/tree/master/doc/docker-compose) for further examples and instructions.
+For setting up a full setup with database and so on, see [ezplatform:doc/docker](https://github.com/ezsystems/ezplatform/tree/master/doc/docker) for further examples and instructions.
 
 
 ## Roadmap for this PHP image
