@@ -21,6 +21,7 @@ env:
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
+  - bin/.travis/update_docker.sh
   - bin/.travis/build.sh ${PHP_VERSION}
 
 script: bin/.travis/test.sh
