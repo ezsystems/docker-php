@@ -13,7 +13,6 @@ env:
     - FORMAT_VERSION="v1"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
-    - PHP_VERSION="5.5" EZ_VERSION="~1.6.0"
     - PHP_VERSION="5.6"
     - PHP_VERSION="7.0"
     - PHP_VERSION="7.1"
@@ -21,6 +20,7 @@ env:
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
+  - bin/.travis/update_docker.sh
   - bin/.travis/build.sh ${PHP_VERSION}
 
 script: bin/.travis/test.sh

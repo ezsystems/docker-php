@@ -29,7 +29,7 @@ fi
 
 if [ "$EZ_VERSION" = "" ]; then
     # pull in latests stable by default
-    EZ_VERSION=""
+    EZ_VERSION="^1.12.0"
 fi
 
 
@@ -81,8 +81,8 @@ cd volumes/ezplatform
 docker tag ez_php:latest "ezsystems/php:7.1-${FORMAT_VERSION}"
 docker tag ez_php:latest "ezsystems/php:7.0-${FORMAT_VERSION}"
 
-export COMPOSE_FILE="doc/docker-compose/base-prod.yml:doc/docker-compose/redis.yml:doc/docker-compose/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
-docker-compose -f doc/docker-compose/install.yml up --abort-on-container-exit
+export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+docker-compose -f doc/docker/install.yml up --abort-on-container-exit
 
 docker-compose up -d --build --force-recreate
 docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -vv --profile=platformui --tags='@common'"
