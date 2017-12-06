@@ -1,5 +1,7 @@
 FROM ez_php
 
+ARG XDEBUG_CHANNEL="xdebug"
+
 # Add additional packages for dev use
 RUN apt-get update -q -y \
  && apt-get install -q -y --no-install-recommends \
@@ -12,5 +14,5 @@ RUN apt-get update -q -y \
         && rm -rf /var/lib/apt/lists/*
 
 # Install xdebug
-RUN echo yes | pecl install -o xdebug
+RUN echo yes | pecl install -o ${XDEBUG_CHANNEL}
 COPY conf.d/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini
