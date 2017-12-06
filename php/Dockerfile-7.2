@@ -60,15 +60,15 @@ RUN set -xe \
     && rm -f /tmp/blackfire-probe.tar.gz \
     \
 # Install msgpack (for more efficient serialization in redis/memcached)
-    && pecl install msgpack \
+    && pecl install -o msgpack \
     && docker-php-ext-enable msgpack \
     \
 # Install redis
-    && pecl install redis \
+    && pecl install -o redis \
     && docker-php-ext-enable redis \
     \
 # Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
-    && echo no | pecl install memcached \
+    && echo no | pecl install -o memcached \
     && docker-php-ext-enable memcached \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
