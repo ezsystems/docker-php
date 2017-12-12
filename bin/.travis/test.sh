@@ -49,7 +49,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
       -v $(pwd)/volumes/ezplatform:/var/www \
       -v  $COMPOSER_HOME:/root/.composer \
       ez_php:latest \
-      bash -c "composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
+      bash -c "composer -v && composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
 fi
 
 

@@ -25,10 +25,11 @@ PHP image that aims to technically support running:
 ## Images
 
 This repository contains several images for different versions of PHP\*:
+- [7.2](php/Dockerfile-7.2) *(Preview, new image based on debian:stretch-slim and with unstable xdebug)*
 - [7.1](php/Dockerfile-7.1) *(Recommended version for testing newest versions of eZ Platform)*
 - [7.0](php/Dockerfile-7.0)
 - [5.6](php/Dockerfile-5.6) *(Security fixes only, time to start to move to PHP7)*
-- [5.5](php/Dockerfile-5.5) *(End of Life, so only meant for compatibility testing for older maintenance releases)*
+- ~~[5.5](php/Dockerfile-5.5) *(End of Life, so only meant for compatibility testing for older maintenance releases)*~~
 
 \* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 

@@ -1,8 +1,10 @@
 FROM ez_php
 
+ARG XDEBUG_CHANNEL="xdebug"
+
 # Add additional packages for dev use
 RUN apt-get update -q -y \
- && apt-get install -q -y --force-yes --no-install-recommends \
+ && apt-get install -q -y --no-install-recommends \
         less \
         mariadb-client \
         vim \
@@ -11,6 +13,6 @@ RUN apt-get update -q -y \
         gdb-minimal \
         && rm -rf /var/lib/apt/lists/*
 
-# Install xdebug
-RUN echo yes | pecl install xdebug
+# Install xdebug (retry 3 times for buggy pecl connection)
+RUN for i in $(seq 1 3); do echo yes | pecl install -o ${XDEBUG_CHANNEL} && s=0 && break || s=$? && sleep 1; done; (exit $s)
 COPY conf.d/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini

@@ -11,8 +11,12 @@ fi
 
 PHP_VERSION="$1"
 
+if [ "$XDEBUG_CHANNEL" = "" ]; then
+    XDEBUG_CHANNEL="xdebug"
+fi
+
 # Build prod container
-docker build --rm=true --pull -f php/Dockerfile-${PHP_VERSION}  -t ez_php:latest php/
+docker build --network=host --no-cache --rm=true --pull -f php/Dockerfile-${PHP_VERSION}  -t ez_php:latest php/
 
 # Build expanded dev container (will extend ez_php:latest, hence why --pull is skipped)
-docker build --rm=true -f php/Dockerfile-dev  -t ez_php:latest-dev php/
+docker build --network=host --no-cache --build-arg XDEBUG_CHANNEL="$XDEBUG_CHANNEL" --rm=true -f  php/Dockerfile-dev  -t ez_php:latest-dev php/
