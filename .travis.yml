@@ -13,10 +13,10 @@ env:
     - FORMAT_VERSION="v1"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
-    - PHP_VERSION="5.6"
+    - PHP_VERSION="5.6" XDEBUG_CHANNEL="xdebug-2.5.5"
     - PHP_VERSION="7.0"
     - PHP_VERSION="7.1"
-    - PHP_VERSION="7.2" XDEBUG_CHANNEL="xdebug-beta"
+    - PHP_VERSION="7.2"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
