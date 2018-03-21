@@ -9,7 +9,7 @@ services:
 env:
   global:
     - REMOTE_IMAGE="ezsystems/php"
-    - LATEST="7.1"
+    - LATEST="7.2"
     - FORMAT_VERSION="v1"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
