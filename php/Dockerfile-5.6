@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:5.6-fpm-jessie
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #
@@ -11,7 +11,7 @@ ENV COMPOSER_HOME=/root/.composer
 
 # Get packages that we need in container
 RUN apt-get update -q -y \
-    && apt-get install -q -y --no-install-recommends \
+    && apt-get install -q -y --force-yes --no-install-recommends \
         ca-certificates \
         curl \
         acl \
@@ -20,8 +20,8 @@ RUN apt-get update -q -y \
         libfreetype6 \
         libjpeg62-turbo \
         libxpm4 \
-        libpng16-16 \
-        libicu57 \
+        libpng12-0 \
+        libicu52 \
         libxslt1.1 \
         libmemcachedutil2 \
 # git & unzip needed for composer, unless we document to use dev image for composer install
@@ -37,12 +37,12 @@ RUN set -xe \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libxpm-dev \
-        libpng-dev \
+        libpng12-dev \
         libicu-dev \
         libxslt1-dev \
         libmemcached-dev \
     " \
-	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y --force-yes $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
     && docker-php-source extract \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
