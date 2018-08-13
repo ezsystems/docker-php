@@ -28,7 +28,7 @@ if [ "$FORMAT_VERSION" = "" ]; then
 fi
 
 if [ "$EZ_VERSION" = "" ]; then
-    # pull in latest stable by default (TODO: v2 does not yet work with redis so we test v1)
+    # pull in latest stable by default (TODO: change to be able to test against v2)
     EZ_VERSION="^1.13.0"
 fi
 
@@ -85,7 +85,7 @@ export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/sel
 docker-compose -f doc/docker/install.yml up --abort-on-container-exit
 
 docker-compose up -d --build --force-recreate
-docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -vv --profile=rest --suite=fullJson --tags=~@broken"
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -vv --profile=platformui --tags='@common'"
 docker-compose down -v
 
 # Remove custom tag
