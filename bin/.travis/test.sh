@@ -28,8 +28,8 @@ if [ "$FORMAT_VERSION" = "" ]; then
 fi
 
 if [ "$EZ_VERSION" = "" ]; then
-    # Let composer pick suitable eZ version by default depending on PHP version
-    EZ_VERSION=""
+    # pull in latest stable by default (TODO: v2 does not yet work with redis so we test v1)
+    EZ_VERSION="^1.13.0"
 fi
 
 
