@@ -73,7 +73,7 @@ RUN set -xe \
     && docker-php-ext-enable redis \
     && cd - \
     \
-# Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
+# Install memcached (manualy build in order to be able to enable igbinary)
     && for i in $(seq 1 3); do echo no | pecl install -o --nobuild memcached-2.2.0 && s=0 && break || s=$? && sleep 1; done; (exit $s) \
     && cd "$(pecl config-get temp_dir)/memcached" \
     && phpize \
