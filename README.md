@@ -117,7 +117,6 @@ For setting up a full setup with database and so on, see [ezplatform:doc/docker]
 - env variable to set session handler, ...
 - Apache + mod_php variant
 - Alpine Linux; *To drop image size, assuming all other official images move to Alpine, incl when blackfire supports it.*
-  - _Note: As of v2 format the difference is not that large anymore as PHP images now build on debian:stretch-slim._
 
 ## Copyright & license
 Copyright [eZ Systems AS](http://ez.no/), for copyright and license details see provided LICENSE file.
