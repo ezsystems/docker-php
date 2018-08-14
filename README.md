@@ -25,8 +25,8 @@ PHP image that aims to technically support running:
 ## Images
 
 This repository contains several images for different versions of PHP\*:
-- [7.2](php/Dockerfile-7.2) *(Recommended version for testing newest versions of eZ Platform)*
-- [7.1](php/Dockerfile-7.1)
+- [7.2](php/Dockerfile-7.2) *(NOTE: Based on debian:stretch-slim and not jessie like the others atm in v1 format)*
+- [7.1](php/Dockerfile-7.1) *(Recommended version for testing newest versions of eZ Platform)*
 - [7.0](php/Dockerfile-7.0)
 - [5.6](php/Dockerfile-5.6) *(Security fixes only, time to start to move to PHP7)*
 - ~~[5.5](php/Dockerfile-5.5) *(End of Life, so only meant for compatibility testing for older maintenance releases)*~~
@@ -44,12 +44,6 @@ To be able to improve the image in the future, we have added a format version nu
 
 It is recommended to specify a tag with this format version number in your Docker / docker-compose use to avoid breaks in your application.
 
-
-#### Changelog
-- v2
-  - As done by upstream PHP image, switched to Debian 9 (debian:stretch-slim) for all supported images (PHP 5.6 - 7.2)
-  - Removed msgpack ext, replaced with igbinary _(+ configure for redis, memcached & session serialization)_
-- v1: Initial stable version
 
 ## Usage
 
