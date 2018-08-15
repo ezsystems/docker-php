@@ -1,4 +1,4 @@
-FROM php:7.1-fpm
+FROM php:7.1-fpm-jessie
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #
@@ -11,7 +11,7 @@ ENV COMPOSER_HOME=/root/.composer
 
 # Get packages that we need in container
 RUN apt-get update -q -y \
-    && apt-get install -q -y --force-yes --no-install-recommends \
+    && apt-get install -q -y --no-install-recommends \
         ca-certificates \
         curl \
         acl \
@@ -42,12 +42,12 @@ RUN set -xe \
         libxslt1-dev \
         libmemcached-dev \
     " \
-	&& apt-get update && apt-get install -y --force-yes $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
     && docker-php-source extract \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-native-ttf --enable-gd-jis-conv \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-jis-conv \
     && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
     && docker-php-ext-enable opcache \
     && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
@@ -59,19 +59,33 @@ RUN set -xe \
     && mv /tmp/blackfire-*.so $(php -r "echo ini_get('extension_dir');")/blackfire.so \
     && rm -f /tmp/blackfire-probe.tar.gz \
     \
-# Install msgpack (for more efficient serialization in redis/memcached)
-    && for i in $(seq 1 3); do pecl install -o msgpack && s=0 && break || s=$? && sleep 1; done; (exit $s) \
-    && docker-php-ext-enable msgpack \
+# Install igbinary (for more efficient serialization in redis/memcached)
+    && for i in $(seq 1 3); do pecl install -o igbinary && s=0 && break || s=$? && sleep 1; done; (exit $s) \
+    && docker-php-ext-enable igbinary \
     \
-# Install redis
-    && for i in $(seq 1 3); do pecl install -o redis && s=0 && break || s=$? && sleep 1; done; (exit $s) \
+# Install redis (manualy build in order to be able to enable igbinary)
+    && for i in $(seq 1 3); do pecl install -o --nobuild redis && s=0 && break || s=$? && sleep 1; done; (exit $s) \
+    && cd "$(pecl config-get temp_dir)/redis" \
+    && phpize \
+    && ./configure --enable-redis-igbinary \
+    && make \
+    && make install \
     && docker-php-ext-enable redis \
+    && cd - \
     \
-# Install memcached (as we are on Debian 8 we have libmemcached 1.0.18 which is recommended)
-    && for i in $(seq 1 3); do echo no | pecl install -o memcached && s=0 && break || s=$? && sleep 1; done; (exit $s) \
+# Install memcached (manualy build in order to be able to enable igbinary)
+    && for i in $(seq 1 3); do echo no | pecl install -o --nobuild memcached && s=0 && break || s=$? && sleep 1; done; (exit $s) \
+    && cd "$(pecl config-get temp_dir)/memcached" \
+    && phpize \
+    && ./configure --enable-memcached-igbinary \
+    && make \
+    && make install \
     && docker-php-ext-enable memcached \
+    && cd - \
     \
 # Delete source & builds deps so it does not hang around in layers taking up space
+    && pecl clear-cache \
+    && rm -Rf "$(pecl config-get temp_dir)/*" \
     && docker-php-source delete \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
 
