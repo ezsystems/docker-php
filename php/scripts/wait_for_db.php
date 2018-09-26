@@ -5,7 +5,7 @@
  *
  * Use:
  * - Main use case is with env variables as found below
- * - For testing against mysql db "ezp" it is possible to execute with `php /script/wait_for_db.php localhost user password
+ * - For testing against mysql db "ezp" it is possible to execute with `php /scripts/wait_for_db.php localhost user password
  *
  * Note: This container is for the time being only compiled with mysql support, so not all options below will work,
  *       it's here for those extending the container to reuse.
