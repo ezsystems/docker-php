@@ -24,6 +24,8 @@ RUN apt-get update -q -y \
         libicu57 \
         libxslt1.1 \
         libmemcachedutil2 \
+# Required by eZ Commerce
+        imagemagick \
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
