@@ -78,17 +78,8 @@ docker run -ti --rm \
 printf "\nVersion and module information about php build\n"
 docker run -ti --rm ez_php:latest-dev bash -c "php -v; php -m"
 
-
 printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform\n"
 cd volumes/ezplatform
-
-# Tag image alias for what (exactly) eZ Platform is currently using in order to be able to test across branches
-## As we don't want it to pull in remote, but rather use what we just built here
-## NOTE: On larger changes to this images, we would need to pull in custom branches with adaptions on Platform side as well as below
-## TODO: The tag aliases here will not be needed once eZ Platform uses PHP_IMAGE variable within Dockerfile's from section
-docker tag ez_php:latest "ezsystems/php:7.2-v1"
-docker tag ez_php:latest "ezsystems/php:7.1-v1"
-docker tag ez_php:latest "ezsystems/php:7.0-v1"
 
 export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
 docker-compose -f doc/docker/install.yml up --abort-on-container-exit
@@ -104,8 +95,3 @@ else
 fi
 
 docker-compose down -v
-
-# Remove custom tag aliases used for Platform testing
-docker rmi "ezsystems/php:7.2-v1"
-docker rmi "ezsystems/php:7.1-v1"
-docker rmi "ezsystems/php:7.0-v1"

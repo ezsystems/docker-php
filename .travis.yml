@@ -17,6 +17,7 @@ env:
     - PHP_VERSION="7.0" EZ_VERSION="^1.13.4"
     - PHP_VERSION="7.1"
     - PHP_VERSION="7.2"
+    - PHP_VERSION="7.3"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi

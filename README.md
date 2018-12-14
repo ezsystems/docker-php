@@ -17,21 +17,22 @@ _NOTE: The images here, just like the official once they extend, are meant to fo
 ## Overview
 
 PHP image that aims to technically support running:
-- eZ Platform
-- eZ Platform EE
+- eZ Platform/Platform Enterprise *(1.13.4 or higher)*
 - eZ Publish 5.4 *(5.4.11 or higher)*
 - Symfony *(As in any symfony-standard like app that have same or less requirements then eZ Platform)*
 
 ## Images
 
 This repository contains several images for different versions of PHP\*:
-- [7.2](php/Dockerfile-7.2) *(NOTE: Based on debian:stretch-slim and not jessie like the others atm in v1 format)*
-- [7.1](php/Dockerfile-7.1)
-- [7.0](php/Dockerfile-7.0)
-- [5.6](php/Dockerfile-5.6) *(Security fixes only, time to start to move to PHP7)*
-- ~~[5.5](php/Dockerfile-5.5) *(End of Life, so only meant for compatibility testing for older maintenance releases)*~~
+- Extends `php:x.y-fpm` _(uses `debian:stretch-slim`)_:
+    - [7.3](php/Dockerfile-7.3) *(Preview, currently missing memcached php extension)*
+    - [7.2](php/Dockerfile-7.2)
+- Extends `php:x.y-fpm-jessie` _(uses `debian:jessie`)_:
+    - [7.1](php/Dockerfile-7.1)
+    - [7.0](php/Dockerfile-7.0)
+    - [5.6](php/Dockerfile-5.6) *(Security fixes only, time to start to move to PHP7)*
 
-_Recommended version for testing newest versions of eZ Platform is PHP 7.2 for best performance, however if you are currently on jessie based images (5.5-7.1) then aiming to get to PHP 7.1 is a good choice too._
+_Recommended version for testing newest versions of eZ Platform is PHP 7.3 for best performance, however if you are currently on jessie based images (5.6-7.1) then aiming to get to PHP 7.1 is a good choice too._
 
 \* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 
@@ -116,7 +117,7 @@ For setting up a full setup with database and so on, see [ezplatform:doc/docker]
  - pdo_pgsql + pdo_sqlite
 - env variable to set session handler, ...
 - Apache + mod_php variant
-- Alpine Linux; *To drop image size, assuming all other official images move to Alpine, incl when blackfire supports it.*
+- Alpine Linux; *To drop image size, assuming all other official images move to Alpine.*
 
 ## Copyright & license
 Copyright [eZ Systems AS](http://ez.no/), for copyright and license details see provided LICENSE file.
