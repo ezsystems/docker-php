@@ -24,6 +24,7 @@ RUN apt-get update -q -y \
         libicu57 \
         libxslt1.1 \
         libmemcachedutil2 \
+        libzip4 \
 # Required by eZ Commerce
         imagemagick \
 # git & unzip needed for composer, unless we document to use dev image for composer install
@@ -43,6 +44,7 @@ RUN set -xe \
         libicu-dev \
         libxslt1-dev \
         libmemcached-dev \
+        libzip-dev \
     " \
 	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
