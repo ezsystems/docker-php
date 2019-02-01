@@ -78,10 +78,10 @@ RUN set -xe \
     \
 # Install Node.js and Yarn
     && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt-get install -q -y --no-install-recommends nodejs \
+    && apt-get install -y nodejs \
     && curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && sudo apt-get update && sudo apt-get install -q -y --no-install-recommends yarn \
+    && sudo apt-get update && sudo apt-get install yarn \
     \
 # Install memcached (manualy build in order to be able to enable igbinary)
     && for i in $(seq 1 3); do echo no | pecl install -o --nobuild memcached && s=0 && break || s=$? && sleep 1; done; (exit $s) \
@@ -97,8 +97,7 @@ RUN set -xe \
     && pecl clear-cache \
     && rm -Rf "$(pecl config-get temp_dir)/*" \
     && docker-php-source delete \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps \ 
-    && apt-get clean
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $buildDeps
 
 # Set timezone
 RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
