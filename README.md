@@ -35,9 +35,13 @@ _Recommended version for testing newest versions of eZ Platform is PHP 7.2 for b
 
 \* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 
+## Node image
+
+For each php version there is an additional `-node` flavour with Node.js (latest LTS version) and Yarn installed, useful if your project needs it (for example for Webpack Encore).
+
 ### Dev image
 
-For each php version there is an additional `-dev` flavour with additional tools for when you need to be able to login and work towards the installation. It contains tools like vim, git, xdebug, ... [and others](php/Dockerfile-dev).
+For each php version there is an additional `-dev` flavour based on Node image, with additional tools for when you need to be able to login and work towards the installation. It contains tools like vim, git, xdebug, ... [and others](php/Dockerfile-dev).
 
 
 ### Format version

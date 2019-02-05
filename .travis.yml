@@ -17,14 +17,12 @@ env:
     - PHP_VERSION="7.0"
     - PHP_VERSION="7.1"
     - PHP_VERSION="7.2"
-    - PHP_VERSION="7.1" WITH_NODE="--with-node" REMOTE_IMAGE="ezsystems/php-node"
-    - PHP_VERSION="7.2" WITH_NODE="--with-node" REMOTE_IMAGE="ezsystems/php-node"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
   - bin/.travis/update_docker.sh
-  - bin/.travis/build.sh ${PHP_VERSION} ${WITH_NODE}
+  - bin/.travis/build.sh ${PHP_VERSION}
 
 script: bin/.travis/test.sh
 
