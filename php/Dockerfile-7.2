@@ -1,6 +1,6 @@
 FROM php:7.2-fpm
 
-# Container containing php-fpm, php-cli and NodeJS to run and interact with eZ Platform and other Symfony projects
+# Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #
 # It has two modes of operation:
 # - (run.sh cmd) [default] Reconfigure eZ Platform/Publish based on provided env variables and start php-fpm
@@ -16,7 +16,6 @@ RUN apt-get update -q -y \
         curl \
         acl \
         sudo \
-        gnupg \ 
 # Needed for the php extensions we enable below
         libfreetype6 \
         libjpeg62-turbo \
@@ -75,13 +74,6 @@ RUN set -xe \
     && make install \
     && docker-php-ext-enable redis \
     && cd - \
-    \
-# Install Node.js and Yarn
-    && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
-    && apt-get install -y nodejs \
-    && curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-    && sudo apt-get update && sudo apt-get install yarn \
     \
 # Install memcached (manualy build in order to be able to enable igbinary)
     && for i in $(seq 1 3); do echo no | pecl install -o --nobuild memcached && s=0 && break || s=$? && sleep 1; done; (exit $s) \
