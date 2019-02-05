@@ -3,6 +3,7 @@
 set -e
 # Expects images from build.sh, as in:
 # - ez_php:latest
+# - ez_php:latest-node
 # - ez_php:latest-dev
 REUSE_VOLUME=0
 
@@ -52,7 +53,11 @@ if [ "$REUSE_VOLUME" = "0" ]; then
       bash -c "composer -v && composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
 fi
 
-
+printf "\nMake sure Node.js and Yarn are included in latest-node and latest-dev\n"
+docker -l error run -a stderr ez_php:latest-node node -e "process.versions.node"
+docker -l error run -a stderr ez_php:latest-dev node -e "process.versions.node"
+docker -l error run -a stderr ez_php:latest-node bash -c "yarn -v"
+docker -l error run -a stderr ez_php:latest-dev bash -c "yarn -v"
 
 printf "\nMinimal testing on ez_php:latest for use with ez user\n"
 docker run -ti --rm \
