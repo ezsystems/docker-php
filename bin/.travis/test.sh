@@ -29,8 +29,8 @@ if [ "$FORMAT_VERSION" = "" ]; then
 fi
 
 if [ "$EZ_VERSION" = "" ]; then
-    # pull in latest stable by default (TODO: change to be able to test against v2)
-    EZ_VERSION="^1.13.0"
+    # pull in latest stable by default
+    EZ_VERSION="^2.4"
 fi
 
 
