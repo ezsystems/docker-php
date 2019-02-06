@@ -67,4 +67,7 @@ env | while IFS='=' read -r name value ; do
   fi
 done
 
+export SYMFONY_TRUSTED_PROXIES=`php /scripts/resolve_trusted_proxies.php`
+echo Resolved SYMFONY_TRUSTED_PROXIES: $SYMFONY_TRUSTED_PROXIES
+
 exec "$@"
