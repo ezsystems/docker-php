@@ -94,7 +94,7 @@ export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/sel
 docker-compose -f doc/docker/install.yml up --abort-on-container-exit
 
 docker-compose up -d --build --force-recreate
-docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -vv --profile=platformui --tags='@common'"
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -v --profile=rest --suite=fullJson --tags=~@broken"
 docker-compose down -v
 
 # Remove custom tag aliases used for Platform testing
