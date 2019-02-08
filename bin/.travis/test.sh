@@ -95,9 +95,12 @@ docker-compose -f doc/docker/install.yml up --abort-on-container-exit
 
 docker-compose up -d --build --force-recreate
 if [ -f bin/console ]; then
+    echo '> Workaround for v2 test issues: Change ownership of files inside docker container'
+    docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
+
     docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; php bin/behat -v --profile=rest --suite=fullJson --tags=~@broken"
 else
-    docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -v --profile=rest --suite=fullJson --tags=~@broken"
+    docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -v --profile=platformui --tags='@common'"
 fi
 
 docker-compose down -v
