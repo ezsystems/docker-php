@@ -26,6 +26,7 @@ RUN apt-get update -q -y \
         libmemcachedutil2 \
 # Required by eZ Commerce
         imagemagick \
+        libxml2-dev \
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
@@ -50,7 +51,7 @@ RUN set -xe \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-jis-conv \
-    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql \
+    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql soap \
     && docker-php-ext-enable opcache \
     && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
     \
