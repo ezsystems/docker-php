@@ -26,7 +26,6 @@ RUN apt-get update -q -y \
         libmemcachedutil2 \
 # Required by eZ Commerce
         imagemagick \
-        libxml2-dev \
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
@@ -44,6 +43,7 @@ RUN set -xe \
         libicu-dev \
         libxslt1-dev \
         libmemcached-dev \
+        libxml2-dev \
     " \
 	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
