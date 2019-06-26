@@ -33,7 +33,6 @@ if [ "$EZ_VERSION" = "" ]; then
     EZ_VERSION="^2.4"
 fi
 
-
 if [ "$REUSE_VOLUME" = "0" ]; then
     printf "\n(Re-)Creating volumes/ezplatform for fresh checkout, needs sudo to delete old and chmod new folder\n"
     sudo rm -Rf volumes/ezplatform
@@ -49,7 +48,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
       -e SYMFONY_ENV \
       -v $(pwd)/volumes/ezplatform:/var/www \
       -v  $COMPOSER_HOME:/root/.composer \
-      ez_php:latest \
+      ez_php:latest-node \
       bash -c "composer -v && composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
 fi
 
