@@ -1,4 +1,5 @@
-FROM php:7.2-fpm-stretch
+ARG DISTRO=stretch
+FROM php:7.2-fpm-$DISTRO
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #

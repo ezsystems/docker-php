@@ -46,10 +46,13 @@ For each php version there is an additional `-dev` flavour based on Node image, 
 
 ### Format version
 
-To be able to improve the image in the future, we have added a format version number that we will increase on future changes *(for instance move to Alpine Linux)*.
+To be able to improve the image as time goes by, we have added a format version number that we will increase on future changes *(for instance move to Alpine Linux)*.
 
 It is recommended to specify a tag with this format version number in your Docker / docker-compose use to avoid breaks in your application.
 
+v1 of 5.6, 7.0 and 7.1 images are based on debian 8 (jessie)
+v2 of 5.6, 7.0 and 7.1 images are based on debian 9 (stretch)
+v1 of 7.2 and 7.3 images are based on debian 9 (stretch)
 
 ## Usage
 
