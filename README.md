@@ -27,12 +27,11 @@ This repository contains several images for different versions of PHP\*:
 - Extends `php:x.y-fpm` _(uses `debian:stretch-slim`)_:
     - [7.3](php/Dockerfile-7.3) *(Preview, xdebug in rc stability*
     - [7.2](php/Dockerfile-7.2)
-- Extends `php:x.y-fpm-jessie` _(uses `debian:jessie`)_:
     - [7.1](php/Dockerfile-7.1)
     - [7.0](php/Dockerfile-7.0)
     - [5.6](php/Dockerfile-5.6) *(Security fixes only, time to start to move to PHP7)*
 
-_Recommended version for testing newest versions of eZ Platform is PHP 7.3 for best performance, however if you are currently on jessie based images (5.6-7.1) then aiming to get to PHP 7.1 is a good choice too._
+_Recommended version for testing newest versions of eZ Platform is PHP 7.3 for best performance._
 
 \* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 
