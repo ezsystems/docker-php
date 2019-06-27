@@ -16,7 +16,7 @@ if [ "$XDEBUG_CHANNEL" = "" ]; then
 fi
 
 # Build prod container
-docker build --network=host --no-cache --rm=true --pull -f php/Dockerfile-${PHP_VERSION} --build-arg DISTRO=${DISTRO} -t ez_php:latest php/
+docker build --network=host --no-cache --rm=true --pull -f php/Dockerfile-${PHP_VERSION}  -t ez_php:latest php/
 
 # Build expanded node container (will extend ez_php:latest, hence why --pull is skipped)
 docker build --network=host --no-cache --rm=true -f  php/Dockerfile-node  -t ez_php:latest-node php/

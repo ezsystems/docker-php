@@ -1,6 +1,4 @@
-ARG DISTRO=stretch
-FROM php:7.1-fpm-$DISTRO
-ARG DISTRO=stretch
+FROM php:7.1-fpm-stretch
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #
@@ -12,8 +10,7 @@ ARG DISTRO=stretch
 ENV COMPOSER_HOME=/root/.composer
 
 # Get packages that we need in container
-RUN if [ "$DISTRO" = "jessie" ]; then PACKAGES="libpng12-0 libicu52"; else PACKAGES="libpng16-16 libicu57"; fi \
-    && apt-get update -q -y \
+RUN apt-get update -q -y \
     && apt-get install -q -y --no-install-recommends \
         ca-certificates \
         curl \
@@ -23,7 +20,8 @@ RUN if [ "$DISTRO" = "jessie" ]; then PACKAGES="libpng12-0 libicu52"; else PACKA
         libfreetype6 \
         libjpeg62-turbo \
         libxpm4 \
-        $PACKAGES \
+        libpng16-16 \
+        libicu57 \
         libxslt1.1 \
         libmemcachedutil2 \
         imagemagick \
@@ -34,14 +32,13 @@ RUN if [ "$DISTRO" = "jessie" ]; then PACKAGES="libpng12-0 libicu52"; else PACKA
     && rm -rf /var/lib/apt/lists/*
 
 # Install and configure php plugins
-RUN if [ "$DISTRO" = "jessie" ]; then PACKAGES="libpng12-dev"; else PACKAGES="libpng-dev"; fi \
-    && set -xe \
+RUN set -xe \
     && buildDeps=" \
         $PHP_EXTRA_BUILD_DEPS \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libxpm-dev \
-        $PACKAGES \
+        libpng-dev \
         libicu-dev \
         libxslt1-dev \
         libmemcached-dev \
