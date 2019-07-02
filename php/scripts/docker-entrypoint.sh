@@ -28,7 +28,9 @@ if [ "$BEHAT_SELENIUM_HOST" != "" ] && [ "$BEHAT_WEB_HOST" != "" ]; then
     logger "Copying behat.yml.dist to behat.yml and updating selenium and web hosts"
     if [ -f behat.yml.dist ]; then
         cp -f behat.yml.dist behat.yml
+        if [ "$MINK_DEFAULT_SESSION" != "" ]; then sed -i "s@javascript_session: selenium@javascript_session: ${MINK_DEFAULT_SESSION}@" behat.yml; fi
         sed -i "s@localhost:4444@${BEHAT_SELENIUM_HOST}:4444@" behat.yml
+        if [ "$BEHAT_CHROMIUM_HOST" != "" ]; then sed -i "s@localhost:9222@${BEHAT_CHROMIUM_HOST}:9222@" behat.yml; fi
         sed -i "s@localhost@${BEHAT_WEB_HOST}@" behat.yml
     else
         logger "No behat.yml.dist found, skipping"
