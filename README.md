@@ -25,7 +25,7 @@ PHP image that aims to technically support running:
 
 This repository contains several images for different versions of PHP\*:
 - Extends `php:x.y-fpm` _(uses `debian:stretch-slim`)_:
-    - [7.3](php/Dockerfile-7.3) *(Preview, xdebug in rc stability*
+    - [7.3](php/Dockerfile-7.3)
     - [7.2](php/Dockerfile-7.2)
     - [7.1](php/Dockerfile-7.1)
     - [7.0](php/Dockerfile-7.0)
