@@ -81,7 +81,12 @@ printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with 
 cd volumes/ezplatform
 
 export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
-docker-compose -f doc/docker/install.yml up --abort-on-container-exit
+
+if [ -f doc/docker/install-dependencies.yml ]; then
+    docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
+else
+    docker-compose -f doc/docker/install.yml up --abort-on-container-exit
+fi
 
 docker-compose up -d --build --force-recreate
 if [ -f bin/console ]; then
