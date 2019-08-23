@@ -60,11 +60,15 @@ for f in /docker-entrypoint-initdb.d/*; do
 done
 
 # Scan for environment variables prefixed with PHP_INI_ENV_ and inject those into ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini
+# Environment variable names cannot contain dots, so use two underscores in that case:
+# PHP_INI_ENV_session__gc_maxlifetime=2592000  --> session.gc_maxlifetime=2592000
 if [ -f ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini ]; then rm ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini; fi
 env | while IFS='=' read -r name value ; do
   if (echo $name|grep -E "^PHP_INI_ENV">/dev/null); then
     # remove PHP_INI_ENV_ prefix
     name=`echo $name | cut -f 4- -d "_"`
+    # Replace __ with .
+    name=${name//__/.}
     echo $name=$value >> ${PHP_INI_DIR}/conf.d/zzz_custom_settings.ini
   fi
 done
