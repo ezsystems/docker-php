@@ -24,14 +24,15 @@ PHP image that aims to technically support running:
 ## Images
 
 This repository contains several images for different versions of PHP\*:
-- Extends `php:x.y-fpm` _(uses `debian:stretch-slim`)_:
+- Extends `php:x.y-fpm` _(uses `debian:stretch-slim` unless otherwise noted)_:
+    - [7.4](php/Dockerfile-7.4) _(uses `debian:buster-slim`)
     - [7.3](php/Dockerfile-7.3)
-    - [7.2](php/Dockerfile-7.2)
-    - [7.1](php/Dockerfile-7.1)
-    - [7.0](php/Dockerfile-7.0)
-    - [5.6](php/Dockerfile-5.6) *(Security fixes only, time to start to move to PHP7)*
+    - [7.2](php/Dockerfile-7.2) *(Security fixes only)*
+    - [7.1](php/Dockerfile-7.1) *(End of life december 2019, move to newer or use LTS packages from a Linux distro instead)*
+    - [7.0](php/Dockerfile-7.0) *(End of life january 2019, move to newer or use LTS packages from a Linux distro instead)*
+    - [5.6](php/Dockerfile-5.6) *(End of life december 2018, move to newer or use LTS packages from a Linux distro instead)*
 
-_Recommended version for testing newest versions of eZ Platform is PHP 7.3 for best performance._
+_Recommended version for testing newest versions of eZ Platform is PHP 7.3 or 7.4 for best performance._
 
 \* *Primarily: Since this is also used to run functional testing against several PHP versions, for any other usage use the recommended image.*
 

@@ -30,7 +30,7 @@ fi
 
 if [ "$EZ_VERSION" = "" ]; then
     # pull in latest stable by default
-    EZ_VERSION="^2.4"
+    EZ_VERSION="^2.5"
 fi
 
 if [ "$REUSE_VOLUME" = "0" ]; then
