@@ -26,6 +26,7 @@ RUN apt-get update -q -y \
         libmemcachedutil2 \
         libzip4 \
         imagemagick \
+        libonig5 \
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
@@ -45,6 +46,7 @@ RUN set -xe \
         libmemcached-dev \
         libzip-dev \
         libxml2-dev \
+        libonig-dev \
     " \
 	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
