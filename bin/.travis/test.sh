@@ -80,7 +80,11 @@ docker run -ti --rm ez_php:latest-dev bash -c "php -v; php -m"
 printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform\n"
 cd volumes/ezplatform
 
-export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+if [ "$USE_PRODUCTION_IMAGES" = "1" ]; then
+  export COMPOSE_FILE="doc/docker/base-prod.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-node"
+else
+  export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+fi
 
 if [ -f doc/docker/install-dependencies.yml ]; then
     docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
