@@ -18,8 +18,8 @@ env:
     - PHP_VERSION="7.1"
     - PHP_VERSION="7.2"
     - PHP_VERSION="7.3"
-    # Due to ezplatform builds being locked with minimum supported PHP versions we use prod docker images on 7.4 to silence deprecation warnings
-    - PHP_VERSION="7.4" USE_PRODUCTION_IMAGES="1"
+    # As builds are made with minimum supported PHP versions we need to force composer update for PHP 7.4 due to ocramius/proxy-manager
+    - PHP_VERSION="7.4" UPDATE_PACKAGES="1"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
