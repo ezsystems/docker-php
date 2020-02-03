@@ -14,10 +14,12 @@ env:
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
     - PHP_VERSION="5.6" XDEBUG_CHANNEL="xdebug-2.5.5" EZ_VERSION="^1.13.4"
-    - PHP_VERSION="7.0" EZ_VERSION="^1.13.4"
+    - PHP_VERSION="7.0" XDEBUG_CHANNEL="xdebug-2.8.1" EZ_VERSION="^1.13.4"
     - PHP_VERSION="7.1"
     - PHP_VERSION="7.2"
-    - PHP_VERSION="7.3" XDEBUG_CHANNEL="xdebug-beta"
+    - PHP_VERSION="7.3"
+    # As builds are made with minimum supported PHP versions we need to force composer update for PHP 7.4 due to ocramius/proxy-manager
+    - PHP_VERSION="7.4" UPDATE_PACKAGES="1"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi

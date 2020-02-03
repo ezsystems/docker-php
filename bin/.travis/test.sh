@@ -30,7 +30,7 @@ fi
 
 if [ "$EZ_VERSION" = "" ]; then
     # pull in latest stable by default
-    EZ_VERSION="^2.4"
+    EZ_VERSION="^2.5"
 fi
 
 if [ "$REUSE_VOLUME" = "0" ]; then
@@ -44,12 +44,28 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     fi
 
     printf "\nBuilding on ez_php:latest, composer will implicit check requirements\n"
-    docker run -ti --rm \
-      -e SYMFONY_ENV \
-      -v $(pwd)/volumes/ezplatform:/var/www \
-      -v  $COMPOSER_HOME:/root/.composer \
-      ez_php:latest-node \
-      bash -c "composer -v && composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
+    if [ "$UPDATE_PACKAGES" = "1" ]; then
+        printf "\nAs requested will also force update packages after create-project\n"
+        docker run -ti --rm \
+          -e SYMFONY_ENV \
+          -e PHP_INI_ENV_memory_limit=3G \
+          -v $(pwd)/volumes/ezplatform:/var/www \
+          -v  $COMPOSER_HOME:/root/.composer \
+          ez_php:latest-node \
+          bash -c "
+          composer --version &&
+          composer create-project --prefer-dist --no-progress --no-interaction --no-scripts ezsystems/ezplatform /var/www $EZ_VERSION &&
+          composer update --prefer-dist --no-progress --no-interaction --with-all-dependencies"
+    else
+        docker run -ti --rm \
+          -e SYMFONY_ENV \
+          -v $(pwd)/volumes/ezplatform:/var/www \
+          -v  $COMPOSER_HOME:/root/.composer \
+          ez_php:latest-node \
+          bash -c "
+          composer --version &&
+          composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
+    fi
 fi
 
 printf "\nMake sure Node.js and Yarn are included in latest-node and latest-dev\n"
