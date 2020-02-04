@@ -18,7 +18,6 @@ _NOTE: The images here, just like the official once they extend, are meant to fo
 
 PHP image that aims to technically support running:
 - eZ Platform/Platform Enterprise *(1.13.4 or higher)*
-- eZ Publish 5.4 *(5.4.11 or higher)*
 - Symfony *(As in any symfony-standard like app that have same or less requirements then eZ Platform)*
 
 ## Images
@@ -28,9 +27,9 @@ This repository contains several images for different versions of PHP\*:
     - [7.4](php/Dockerfile-7.4) _(uses `debian:buster-slim`)
     - [7.3](php/Dockerfile-7.3)
     - [7.2](php/Dockerfile-7.2) *(Security fixes only)*
-    - [7.1](php/Dockerfile-7.1) *(End of life december 2019, move to newer or use LTS packages from a Linux distro instead)*
-    - [7.0](php/Dockerfile-7.0) *(End of life january 2019, move to newer or use LTS packages from a Linux distro instead)*
-    - [5.6](php/Dockerfile-5.6) *(End of life december 2018, move to newer or use LTS packages from a Linux distro instead)*
+    - [7.1](php/Dockerfile-7.1) *(End of life December 2019, move to newer or use LTS packages from a Linux distro instead)*
+    - [7.0](php/Dockerfile-7.0) *(End of life January 2019, move to newer or use LTS packages from a Linux distro instead)*
+    - [5.6](php/Dockerfile-5.6) *(End of life December 2018, move to newer or use LTS packages from a Linux distro instead)*
 
 _Recommended version for testing newest versions of eZ Platform is PHP 7.3 or 7.4 for best performance._
 
