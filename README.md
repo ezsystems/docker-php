@@ -24,7 +24,7 @@ PHP image that aims to technically support running:
 
 This repository contains several images for different versions of PHP\*:
 - Extends `php:x.y-fpm` _(uses `debian:stretch-slim` unless otherwise noted)_:
-    - [7.4](php/Dockerfile-7.4) _(uses `debian:buster-slim`)
+    - [7.4](php/Dockerfile-7.4) *(uses `debian:buster-slim`)*
     - [7.3](php/Dockerfile-7.3)
     - [7.2](php/Dockerfile-7.2) *(Security fixes only)*
     - [7.1](php/Dockerfile-7.1) *(End of life December 2019, move to newer or use LTS packages from a Linux distro instead)*
