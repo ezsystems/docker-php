@@ -10,7 +10,7 @@ env:
   global:
     - REMOTE_IMAGE="ezsystems/php"
     - LATEST="7.2"
-    - FORMAT_VERSION="v1"
+    - FORMAT_VERSION="v2"
   matrix:
     # Run once per Dockerfile-<PHP_VERSION>
     - PHP_VERSION="5.6" XDEBUG_CHANNEL="xdebug-2.5.5" EZ_VERSION="^1.13.4"
