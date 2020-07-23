@@ -20,6 +20,8 @@ PHP image that aims to technically support running:
 - eZ Platform/Platform Enterprise *(1.13.4 or higher)*
 - Symfony *(As in any symfony-standard like app that have same or less requirements then eZ Platform)*
 
+The v1 format images are meant for eZ Platform v1, for images that can be used with eZ Platform v2 and v3 look at the v2 format.
+
 ## Images
 
 This repository contains several images for different versions of PHP\*:
@@ -37,7 +39,7 @@ _Recommended version for testing newest versions of eZ Platform is PHP 7.3 or 7.
 
 ## Node image
 
-For each php version there is an additional `-node` flavour with Node.js (latest LTS version) and Yarn installed, useful if your project needs it (for example for Webpack Encore).
+For each php version there is an additional `-node` flavour with Node.js (Node 10 LTS) and Yarn installed, useful if your project needs it (for example for Webpack Encore).
 
 ### Dev image
 
