@@ -45,6 +45,7 @@ For each php version there is an additional `-node` flavour with Node.js (Node 1
 
 For each php version there is an additional `-dev` flavour based on Node image, with additional tools for when you need to be able to login and work towards the installation. It contains tools like vim, git, xdebug, ... [and others](php/Dockerfile-dev).
 
+Tip: To customize Xdebug configuration you can use `XDEBUG_CONFIG` environment variable, check *Using an environment* variable section in [Xdebug](https://xdebug.org/docs/remote) documentation.
 
 ### Format version
 
