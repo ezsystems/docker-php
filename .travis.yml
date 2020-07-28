@@ -9,21 +9,30 @@ services:
 env:
   global:
     - REMOTE_IMAGE="ezsystems/php"
-    - LATEST="7.3"
+    - LATEST_PHP="7.3"
+    - LATEST_NODE="12"
     - FORMAT_VERSION="v2"
   matrix:
-    # Run once per Dockerfile-<PHP_VERSION>
-    - PHP_VERSION="7.1" EZ_VERSION="^2.5"
-    - PHP_VERSION="7.2" EZ_VERSION="^2.5"
-    - PHP_VERSION="7.3" UPDATE_PACKAGES="1"
+    # Run per Dockerfile-<PHP_VERSION>-<NODE_VERSION>
+    - PHP_VERSION="7.1" NODE_VERSION="10" EZ_VERSION="^2.5"
+    - PHP_VERSION="7.1" NODE_VERSION="12" EZ_VERSION="^2.5"
+    - PHP_VERSION="7.1" NODE_VERSION="14" EZ_VERSION="^2.5"
+    - PHP_VERSION="7.2" NODE_VERSION="10" EZ_VERSION="^2.5"
+    - PHP_VERSION="7.2" NODE_VERSION="12" EZ_VERSION="^2.5"
+    - PHP_VERSION="7.2" NODE_VERSION="14" EZ_VERSION="^2.5"
+    - PHP_VERSION="7.3" NODE_VERSION="10" UPDATE_PACKAGES="1"
+    - PHP_VERSION="7.3" NODE_VERSION="12" UPDATE_PACKAGES="1"
+    - PHP_VERSION="7.3" NODE_VERSION="14" UPDATE_PACKAGES="1"
     # As builds are made with minimum supported PHP versions we need to force composer update for PHP 7.4 due to ocramius/proxy-manager
-    - PHP_VERSION="7.4" UPDATE_PACKAGES="1"
+    - PHP_VERSION="7.4" NODE_VERSION="10" UPDATE_PACKAGES="1"
+    - PHP_VERSION="7.4" NODE_VERSION="12" UPDATE_PACKAGES="1"
+    - PHP_VERSION="7.4" NODE_VERSION="14" UPDATE_PACKAGES="1"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
   - bin/.travis/update_docker.sh
-  - bin/.travis/build.sh ${PHP_VERSION}
+  - bin/.travis/build.sh ${PHP_VERSION} ${NODE_VERSION}
 
 script: bin/.travis/test.sh
 

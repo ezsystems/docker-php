@@ -1,4 +1,4 @@
-FROM ez_php:latest-node
+FROM ez_php:latest
 
 ARG XDEBUG_CHANNEL="xdebug"
 
