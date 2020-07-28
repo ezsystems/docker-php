@@ -105,7 +105,10 @@ COPY conf.d/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
 
 # Create Composer directory (cache and auth files) & Get Composer
 RUN mkdir -p $COMPOSER_HOME \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+    && curl -sS https://getcomposer.org/installer > ~/composer_installer.php \ 
+    && php ~/composer_installer.php --install-dir=/usr/local/bin --filename=composer --version=1.10.8 && composer self-update --1 \
+    && php ~/composer_installer.php --install-dir=/usr/local/bin --filename=composer2 && composer2 self-update --preview \ 
+    && rm ~/composer_installer.php
 
 # As application is put in as volume we do all needed operation on run
 COPY scripts /scripts

@@ -75,6 +75,9 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     fi
 fi
 
+printf "\nMake sure Composer2 is available in latest\n"
+docker -l error run -a stderr ez_php:latest bash -c "composer2 --version"
+
 printf "\nMake sure Node.js and Yarn are included in latest-node and latest-dev\n"
 docker -l error run -a stderr ez_php:latest-node node -e "process.versions.node"
 docker -l error run -a stderr ez_php:latest-dev node -e "process.versions.node"
