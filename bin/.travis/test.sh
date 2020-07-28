@@ -101,10 +101,16 @@ fi
 printf "\nVersion and module information about php build\n"
 docker run -ti --rm ez_php:latest-dev bash -c "php -v; php -m"
 
+printf "\nVersion and module information about php build with disabled xdebug\n"
+docker run -ti --rm -e DISABLE_XDEBUG="1" ez_php:latest-dev bash -c "php -v; php -m"
+
 printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform\n"
 cd volumes/ezplatform
 
-export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" DISABLE_XDEBUG="1" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" APP_ENV="behat" APP_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" 
+export DISABLE_XDEBUG="1" 
+export SYMFONY_ENV="behat" SYMFONY_DEBUG="0" APP_ENV="behat" APP_DEBUG="0" 
+export PHP_IMAGE="ez_php:latest-dev" PHP_IMAGE_DEV="ez_php:latest-dev"
 
 docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
 
