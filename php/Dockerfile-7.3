@@ -26,7 +26,7 @@ RUN apt-get update -q -y \
         libmemcachedutil2 \
         libzip4 \
         imagemagick \
-        libmagickwand-dev \
+        libpq5 \ 
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
@@ -46,14 +46,17 @@ RUN set -xe \
         libmemcached-dev \
         libzip-dev \
         libxml2-dev \
+        libmagickwand-dev \
+        libpq-dev \
     " \
 	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
     && docker-php-source extract \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/ --with-xpm-dir=/usr/include/ --enable-gd-jis-conv \
-    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql soap bcmath \
+    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql pdo_pgsql pgsql soap bcmath \
     && docker-php-ext-enable opcache \
     && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
     \
