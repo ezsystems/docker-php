@@ -78,23 +78,6 @@ printf "\nMake sure Node.js and Yarn are included in latest-dev\n"
 docker -l error run -a stderr ez_php:latest-dev node -e "process.versions.node"
 docker -l error run -a stderr ez_php:latest-dev bash -c "yarn -v"
 
-if [ "$EZ_VERSION" = "^2.5" ]; then
-    printf "\nMinimal testing on ez_php:latest for use with ez user\n"
-    docker run -ti --rm \
-    -v $(pwd)/volumes/ezplatform:/var/www \
-    -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
-    ez_php:latest \
-    bash -c "php testSymfonyRequirements.php"
-
-
-    printf "\nMinimal testing on ez_php:latest-dev for use with ez user\n"
-    docker run -ti --rm \
-    -v $(pwd)/volumes/ezplatform:/var/www \
-    -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
-    ez_php:latest-dev \
-    bash -c "php testSymfonyRequirements.php"
-fi
-
 printf "\nVersion and module information about php build\n"
 docker run -ti --rm ez_php:latest-dev bash -c "php -v; php -m"
 
