@@ -36,11 +36,9 @@ before_script:
 script: bin/.travis/test.sh
 after_failure: if [ -d volumes/ezplatform ]; then cd volumes/ezplatform; docker-compose logs; fi
 
-jobs:
-  include:
-  - stage: deploy
-    if: branch IN (v1, master)
-    script: bin/.travis/push.sh ${REMOTE_IMAGE} ${FORMAT_VERSION}
+after_success: 
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then exit 0; fi
+  - if [ "$TRAVIS_BRANCH" = "master" ] || [ "$TRAVIS_BRANCH" = "v1" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${FORMAT_VERSION}; fi
 
 # test only master (+ Pull requests)
 branches:
