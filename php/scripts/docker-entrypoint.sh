@@ -37,10 +37,10 @@ if [ "$BEHAT_SELENIUM_HOST" != "" ] && [ "$BEHAT_WEB_HOST" != "" ]; then
     fi
 fi
 
-## Disable xdebug if DISABLE_XDEBUG env is defined
-if [ -f ${PHP_INI_DIR}/conf.d/xdebug.ini ] && [ "${DISABLE_XDEBUG}" != "" ]; then
-    logger "Disabling xdebug"
-    rm -f ${PHP_INI_DIR}/conf.d/xdebug.ini
+## Enable xdebug if ENABLE_XDEBUG env is defined
+if [ ! -f ${PHP_INI_DIR}/conf.d/xdebug.ini ] && [ "${ENABLE_XDEBUG}" != "" ]; then
+    logger "Enabling xdebug"
+    mv ${PHP_INI_DIR}/conf.d/xdebug.ini.disabled ${PHP_INI_DIR}/conf.d/xdebug.ini
 fi
 
 ## Auto adjust log folder for xdebug if enabled

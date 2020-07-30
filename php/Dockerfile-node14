@@ -1,4 +1,4 @@
-FROM ez_php:latest-dev-interim
+FROM ez_php:latest
 
 # Install Node.js and Yarn
 RUN apt-get update -q -y \
