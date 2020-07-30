@@ -28,17 +28,19 @@ env:
     - PHP_VERSION="7.4" NODE_VERSION="12" UPDATE_PACKAGES="1"
     - PHP_VERSION="7.4" NODE_VERSION="14" UPDATE_PACKAGES="1"
 
-before_script:
-  - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
-  - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
-  - bin/.travis/update_docker.sh
-  - bin/.travis/build.sh ${PHP_VERSION} ${NODE_VERSION}
-
-script: bin/.travis/test.sh
-
-after_success: if [ "$TRAVIS_BRANCH" = "master" ] && [ "$TRAVIS_PULL_REQUEST" = "false" ]; then bin/.travis/push.sh ${REMOTE_IMAGE} ${FORMAT_VERSION}; fi
-
-after_failure: if [ -d volumes/ezplatform ]; then cd volumes/ezplatform; docker-compose logs; fi
+jobs:
+  include:
+  - stage: tests
+    before_script:
+      - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
+      - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
+      - bin/.travis/update_docker.sh
+      - bin/.travis/build.sh ${PHP_VERSION} ${NODE_VERSION}
+    script: bin/.travis/test.sh
+    after_failure: if [ -d volumes/ezplatform ]; then cd volumes/ezplatform; docker-compose logs; fi
+  - stage: deploy
+    if: branch IN (v1, master)
+    script: bin/.travis/push.sh ${REMOTE_IMAGE} ${FORMAT_VERSION}
 
 # test only master (+ Pull requests)
 branches:
