@@ -51,9 +51,12 @@ docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${VERSION_FORMAT}"
 docker tag ez_php:latest-node "${REMOTE_IMAGE}:${PHP_VERSION}-${VERSION_FORMAT}-node${NODE_VERSION}"
 
 # "latest" (optional)
-if [ "$LATEST_PHP" = "$PHP_VERSION" ] && [ "$LATEST_NODE" = "$NODE_VERSION" ]; then
+if [ "$LATEST_PHP" = "$PHP_VERSION" ]; then
     docker tag ez_php:latest "${REMOTE_IMAGE}:latest"
-    docker tag ez_php:latest-node "${REMOTE_IMAGE}:latest-node"
+    docker tag ez_php:latest-node "${REMOTE_IMAGE}:latest-node${NODE_VERSION}"
+    if [ "$LATEST_NODE" = "$NODE_VERSION" ]; then
+        docker tag ez_php:latest-node "${REMOTE_IMAGE}:latest-node"
+    fi
 fi
 
 echo "Pushing docker image with all tags : ${REMOTE_IMAGE}"
