@@ -73,4 +73,19 @@ env | while IFS='=' read -r name value ; do
   fi
 done
 
+# Scan for environment variables prefixed with PHP_FPM_INI_ENV_ and inject those into /usr/local/etc/php-fpm.d/zzz_custom_settings.conf
+# Environment variable names cannot contain dots, so use two underscores in that case:
+# PHP_FPM_INI_ENV_pm__max_children=10  --> pm.max_children=10
+if [ -f /usr/local/etc/php-fpm.d/zzz_custom_settings.conf ]; then rm /usr/local/etc/php-fpm.d/zzz_custom_settings.conf; fi
+echo '[www]' > /usr/local/etc/php-fpm.d/zzz_custom_settings.conf
+env | while IFS='=' read -r name value ; do
+  if (echo $name|grep -E "^PHP_FPM_INI_ENV">/dev/null); then
+    # remove PHP_FPM_INI_ENV_ prefix
+    name=`echo $name | cut -f 5- -d "_"`
+    # Replace __ with .
+    name=${name//__/.}
+    echo $name=$value >> /usr/local/etc/php-fpm.d/zzz_custom_settings.conf
+  fi
+done
+
 exec "$@"
