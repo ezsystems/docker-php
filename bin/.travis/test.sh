@@ -3,7 +3,7 @@
 set -e
 # Expects images from build.sh, as in:
 # - ez_php:latest
-# - ez_php:latest-dev
+# - ez_php:latest-node
 REUSE_VOLUME=0
 
 ## Parse arguments
@@ -55,7 +55,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
           -v  $COMPOSER_HOME:/root/.composer \
-          ez_php:latest-dev \
+          ez_php:latest-node \
           bash -c "
           composer --version &&
           composer create-project --prefer-dist --no-progress --no-interaction --no-scripts ezsystems/ezplatform /var/www $EZ_VERSION &&
@@ -67,29 +67,29 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
           -v  $COMPOSER_HOME:/root/.composer \
-          ez_php:latest-dev \
+          ez_php:latest-node \
           bash -c "
           composer --version &&
           composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
     fi
 fi
 
-printf "\nMake sure Node.js and Yarn are included in latest-dev\n"
-docker -l error run -a stderr ez_php:latest-dev node -e "process.versions.node"
-docker -l error run -a stderr ez_php:latest-dev bash -c "yarn -v"
+printf "\nMake sure Node.js and Yarn are included in latest-node\n"
+docker -l error run -a stderr ez_php:latest-node node -e "process.versions.node"
+docker -l error run -a stderr ez_php:latest-node bash -c "yarn -v"
 
 printf "\nVersion and module information about php build\n"
-docker run -ti --rm ez_php:latest-dev bash -c "php -v; php -m"
+docker run -ti --rm ez_php:latest-node bash -c "php -v; php -m"
 
 printf "\nVersion and module information about php build with enabled xdebug\n"
-docker run -ti --rm -e ENABLE_XDEBUG="1" ez_php:latest-dev bash -c "php -v; php -m"
+docker run -ti --rm -e ENABLE_XDEBUG="1" ez_php:latest-node bash -c "php -v; php -m"
 
-printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform\n"
+printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-node with eZ Platform\n"
 cd volumes/ezplatform
 
 export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" 
 export SYMFONY_ENV="behat" SYMFONY_DEBUG="0" APP_ENV="behat" APP_DEBUG="0" 
-export PHP_IMAGE="ez_php:latest-dev" PHP_IMAGE_DEV="ez_php:latest-dev"
+export PHP_IMAGE="ez_php:latest-node" PHP_IMAGE_DEV="ez_php:latest-node"
 
 docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
 

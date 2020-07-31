@@ -4,7 +4,7 @@ set -e
 
 # Expects images from build.sh, as in:
 # - ez_php:latest
-# - ez_php:latest-dev
+# - ez_php:latest-node
 
 validateEnvironment()
 {
@@ -34,7 +34,7 @@ REMOTE_IMAGE="$1"
 VERSION_FORMAT="$2"
 
 PHP_VERSION=`docker -l error run ez_php:latest php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;"`
-NODE_VERSION=`docker -l error run ez_php:latest-dev node -e "console.log(process.versions.node)"` 
+NODE_VERSION=`docker -l error run ez_php:latest-node node -e "console.log(process.versions.node)"` 
 
 docker images
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
@@ -44,16 +44,16 @@ echo "About to tag remote image '${REMOTE_IMAGE}' with php version '${PHP_VERSIO
 
 # "7.0"
 docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}"
-docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-dev-node${NODE_VERSION}"
+docker tag ez_php:latest-node "${REMOTE_IMAGE}:${PHP_VERSION}-node${NODE_VERSION}"
 
 # "7.0-v0"
 docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${VERSION_FORMAT}"
-docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-${VERSION_FORMAT}-dev-node${NODE_VERSION}"
+docker tag ez_php:latest-node "${REMOTE_IMAGE}:${PHP_VERSION}-${VERSION_FORMAT}-node${NODE_VERSION}"
 
 # "latest" (optional)
 if [ "$LATEST_PHP" = "$PHP_VERSION" ] && [ "$LATEST_NODE" = "$NODE_VERSION" ]; then
     docker tag ez_php:latest "${REMOTE_IMAGE}:latest"
-    docker tag ez_php:latest-dev "${REMOTE_IMAGE}:latest-dev"
+    docker tag ez_php:latest-node "${REMOTE_IMAGE}:latest-node"
 fi
 
 echo "Pushing docker image with all tags : ${REMOTE_IMAGE}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# Builds ez_php:latest and ez_php:latest-dev locally to avoid issues when pushing.
+# Builds ez_php:latest and ez_php:latest-node locally to avoid issues when pushing.
 
 set -e
 
@@ -21,4 +21,4 @@ NODE_VERSION="$2"
 docker build --network=host --no-cache --rm=true --pull -f php/Dockerfile-${PHP_VERSION}  -t ez_php:latest php/
 
 # Build container with Node (will extend ez_php:latest, hence why --pull is skipped)
-docker build --network=host --no-cache --rm=true -f  php/Dockerfile-node${NODE_VERSION} -t ez_php:latest-dev php/
+docker build --network=host --no-cache --rm=true -f  php/Dockerfile-node${NODE_VERSION} -t ez_php:latest-node php/
