@@ -36,23 +36,12 @@ docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
 ## TAGS
 echo "About to tag remote image '${REMOTE_IMAGE}' with php version '${PHP_VERSION}' and Node '${NODE_VERSION}'"
 
-# "7.0"
-docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}"
-docker tag ez_php:latest-node "${REMOTE_IMAGE}:${PHP_VERSION}-node"
-docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-dev"
-
 # "7.0-v0"
 if [ "$2" != "" ]; then
     docker tag ez_php:latest "${REMOTE_IMAGE}:${PHP_VERSION}-${2}"
     docker tag ez_php:latest-node "${REMOTE_IMAGE}:${PHP_VERSION}-${2}-node"
     docker tag ez_php:latest-dev "${REMOTE_IMAGE}:${PHP_VERSION}-${2}-dev"
 fi
-
-# "latest" (optional)
-if [ "$LATEST" = "$PHP_VERSION" ]; then
-    docker tag ez_php:latest "${REMOTE_IMAGE}:latest"
-fi
-
 
 # "7.0.4"
 #PHP_VERSION=`docker -l error run ez_php:latest php -r "echo PHP_VERSION;"`
