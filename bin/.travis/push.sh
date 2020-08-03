@@ -35,6 +35,7 @@ VERSION_FORMAT="$2"
 
 PHP_VERSION=`docker -l error run ez_php:latest php -r "echo PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;"`
 NODE_VERSION=`docker -l error run ez_php:latest-node node -e "console.log(process.versions.node)"` 
+NODE_VERSION=`echo $NODE_VERSION | cut -f 1 -d "."`
 
 docker images
 docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
