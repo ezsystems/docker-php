@@ -22,8 +22,6 @@ $host = getenv('DATABASE_HOST') ?: (!empty($argv[1]) ? $argv[1] : 'db');
 $port = getenv('DATABASE_PORT');
 $name = getenv('DATABASE_NAME') ?: 'ezp';
 
-
-
 /**
  * Special handling for the different database drivers.
  *
@@ -38,10 +36,11 @@ if ($driver === 'sqlite') {
     $dsn = "sqlsrv:Server=${host}" . ($port ? ",${port}" : '') . ";Database=${name};";
 } else if ($driver === 'oci8') {
     $dsn = "oci:dbname=//${host}" . ($port ? ":${port}" : '') . "/${name};";
+} else if ($driver === "pdo_pgsql") {
+    $dsn = "pgsql:host=${host};" . ($port ? "port=${port};" : ''). "dbname=${name};";
 } else {
     $dsn = "${driver}:host=${host};" . ($port ? "port=${port};" : ''). "dbname=${name};";
 }
-
 
 /**
  * User credentials
