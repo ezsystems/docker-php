@@ -4,7 +4,6 @@ set -e
 # Expects images from build.sh, as in:
 # - ez_php:latest
 # - ez_php:latest-node
-# - ez_php:latest-dev
 REUSE_VOLUME=0
 
 ## Parse arguments
@@ -20,17 +19,21 @@ case $i in
 esac
 done
 
+if [ "$APP_ENV" = "" ]; then
+    APP_ENV="prod"
+fi
+
 if [ "$SYMFONY_ENV" = "" ]; then
     SYMFONY_ENV="prod"
 fi
 
 if [ "$FORMAT_VERSION" = "" ]; then
-    FORMAT_VERSION="v1"
+    FORMAT_VERSION="v2"
 fi
 
 if [ "$EZ_VERSION" = "" ]; then
     # pull in latest stable by default
-    EZ_VERSION="^2.5"
+    EZ_VERSION="^3.0@dev"
 fi
 
 if [ "$REUSE_VOLUME" = "0" ]; then
@@ -48,6 +51,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
         printf "\nAs requested will also force update packages after create-project\n"
         docker run -ti --rm \
           -e SYMFONY_ENV \
+          -e APP_ENV \
           -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
           -v  $COMPOSER_HOME:/root/.composer \
@@ -59,6 +63,8 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     else
         docker run -ti --rm \
           -e SYMFONY_ENV \
+          -e APP_ENV \
+          -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
           -v  $COMPOSER_HOME:/root/.composer \
           ez_php:latest-node \
@@ -68,50 +74,29 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     fi
 fi
 
-printf "\nMake sure Node.js and Yarn are included in latest-node and latest-dev\n"
+printf "\nMake sure Node.js and Yarn are included in latest-node\n"
 docker -l error run -a stderr ez_php:latest-node node -e "process.versions.node"
-docker -l error run -a stderr ez_php:latest-dev node -e "process.versions.node"
 docker -l error run -a stderr ez_php:latest-node bash -c "yarn -v"
-docker -l error run -a stderr ez_php:latest-dev bash -c "yarn -v"
-
-printf "\nMinimal testing on ez_php:latest for use with ez user\n"
-docker run -ti --rm \
-  -v $(pwd)/volumes/ezplatform:/var/www \
-  -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
-  ez_php:latest \
-  bash -c "php testSymfonyRequirements.php"
-
-
-printf "\nMinimal testing on ez_php:latest-dev for use with ez user\n"
-docker run -ti --rm \
-  -v $(pwd)/volumes/ezplatform:/var/www \
-  -v $(pwd)/bin/.travis/testSymfonyRequirements.php:/var/www/testSymfonyRequirements.php \
-  ez_php:latest-dev \
-  bash -c "php testSymfonyRequirements.php"
-
 
 printf "\nVersion and module information about php build\n"
-docker run -ti --rm ez_php:latest-dev bash -c "php -v; php -m"
+docker run -ti --rm ez_php:latest-node bash -c "php -v; php -m"
 
-printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-dev with eZ Platform\n"
+printf "\nVersion and module information about php build with enabled xdebug\n"
+docker run -ti --rm -e ENABLE_XDEBUG="1" ez_php:latest-node bash -c "php -v; php -m"
+
+printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-node with eZ Platform\n"
 cd volumes/ezplatform
 
-export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" SYMFONY_ENV="behat" SYMFONY_DEBUG="0" PHP_IMAGE="ez_php:latest" PHP_IMAGE_DEV="ez_php:latest-dev"
+export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" 
+export SYMFONY_ENV="behat" SYMFONY_DEBUG="0" APP_ENV="behat" APP_DEBUG="0" 
+export PHP_IMAGE="ez_php:latest-node" PHP_IMAGE_DEV="ez_php:latest-node"
 
-if [ -f doc/docker/install-dependencies.yml ]; then
-    docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
-else
-    docker-compose -f doc/docker/install.yml up --abort-on-container-exit
-fi
+docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
 
 docker-compose up -d --build --force-recreate
-if [ -f bin/console ]; then
-    echo '> Workaround for v2 test issues: Change ownership of files inside docker container'
-    docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
+echo '> Workaround for test issues: Change ownership of files inside docker container'
+docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
 
-    docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; php bin/behat -v --profile=rest --suite=fullJson --tags=~@broken"
-else
-    docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php app/console cache:warmup; php bin/behat -v --profile=platformui --tags='@common'"
-fi
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; php bin/behat -v --profile=adminui --suite=richtext"
 
 docker-compose down -v

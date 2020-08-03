@@ -27,10 +27,18 @@ RUN apt-get update -q -y \
         libzip4 \
         imagemagick \
         libonig5 \
+        libpq5 \ 
 # git & unzip needed for composer, unless we document to use dev image for composer install
 # unzip needed due to https://github.com/composer/composer/issues/4471
         unzip \
         git \
+# packages useful for dev
+        less \
+        mariadb-client \
+        vim \
+        wget \
+        tree \
+        gdb-minimal \
     && rm -rf /var/lib/apt/lists/*
 
 # Install and configure php plugins
@@ -47,17 +55,25 @@ RUN set -xe \
         libzip-dev \
         libxml2-dev \
         libonig-dev \
+        libmagickwand-dev \
+        libpq-dev \
     " \
 	&& apt-get update -q -y && apt-get install -q -y --no-install-recommends $buildDeps && rm -rf /var/lib/apt/lists/* \
 # Extract php source and install missing extensions
     && docker-php-source extract \
     && docker-php-ext-configure mysqli --with-mysqli=mysqlnd \
     && docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ --with-xpm=/usr/include/ --enable-gd-jis-conv \
-    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql soap bcmath \
+    && docker-php-ext-install exif gd mbstring intl xsl zip mysqli pdo_mysql pdo_pgsql pgsql soap bcmath \
     && docker-php-ext-enable opcache \
     && cp /usr/src/php/php.ini-production ${PHP_INI_DIR}/php.ini \
     \
+# Install imagemagick
+    && for i in $(seq 1 3); do pecl install -o imagick && s=0 && break || s=$? && sleep 1; done; (exit $s) \
+    && docker-php-ext-enable imagick \
+# Install xdebug
+    && for i in $(seq 1 3); do echo yes | pecl install -o "xdebug" && s=0 && break || s=$? && sleep 1; done; (exit $s) \
 # Install blackfire: https://blackfire.io/docs/integrations/docker
     && version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/amd64/$version \
@@ -102,6 +118,7 @@ RUN echo "UTC" > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzd
 RUN sed -i "s@^\[global\]@\[global\]\n\npid = /run/php-fpm.pid@" ${PHP_INI_DIR}-fpm.conf
 
 COPY conf.d/blackfire.ini ${PHP_INI_DIR}/conf.d/blackfire.ini
+COPY conf.d/xdebug.ini ${PHP_INI_DIR}/conf.d/xdebug.ini.disabled
 
 # Create Composer directory (cache and auth files) & Get Composer
 RUN mkdir -p $COMPOSER_HOME \
