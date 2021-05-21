@@ -6,6 +6,10 @@ language: generic
 services:
   - docker
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 env:
   global:
     - REMOTE_IMAGE="ezsystems/php"
@@ -14,23 +18,24 @@ env:
     - FORMAT_VERSION="v2"
   matrix:
     # Run per Dockerfile-<PHP_VERSION>-<NODE_VERSION>
-    - PHP_VERSION="7.1" NODE_VERSION="10" EZ_VERSION="^2.5@dev"
-    - PHP_VERSION="7.1" NODE_VERSION="12" EZ_VERSION="^2.5@dev"
-    - PHP_VERSION="7.1" NODE_VERSION="14" EZ_VERSION="^2.5@dev"
-    - PHP_VERSION="7.2" NODE_VERSION="10" EZ_VERSION="^2.5@dev"
-    - PHP_VERSION="7.2" NODE_VERSION="12" EZ_VERSION="^2.5@dev"
-    - PHP_VERSION="7.2" NODE_VERSION="14" EZ_VERSION="^2.5@dev"
-    - PHP_VERSION="7.3" NODE_VERSION="10" UPDATE_PACKAGES="1"
-    - PHP_VERSION="7.3" NODE_VERSION="12" UPDATE_PACKAGES="1"
-    - PHP_VERSION="7.3" NODE_VERSION="14" UPDATE_PACKAGES="1"
-    # As builds are made with minimum supported PHP versions we need to force composer update for PHP 7.4 due to ocramius/proxy-manager
-    - PHP_VERSION="7.4" NODE_VERSION="10" UPDATE_PACKAGES="1"
-    - PHP_VERSION="7.4" NODE_VERSION="12" UPDATE_PACKAGES="1"
-    - PHP_VERSION="7.4" NODE_VERSION="14" UPDATE_PACKAGES="1"
+    - PHP_VERSION="7.1" NODE_VERSION="10" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
+    - PHP_VERSION="7.1" NODE_VERSION="12" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
+    - PHP_VERSION="7.1" NODE_VERSION="14" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
+    - PHP_VERSION="7.2" NODE_VERSION="10" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
+    - PHP_VERSION="7.2" NODE_VERSION="12" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
+    - PHP_VERSION="7.2" NODE_VERSION="14" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
+    - PHP_VERSION="7.3" NODE_VERSION="10" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.3" NODE_VERSION="12" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.3" NODE_VERSION="14" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.4" NODE_VERSION="10" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.4" NODE_VERSION="12" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.4" NODE_VERSION="14" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
 
 before_script:
   - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
+  - if [[ -n "${DOCKER_PASSWORD_TEST}" ]]; then echo ${DOCKER_PASSWORD_TEST} | docker login -u ${DOCKER_USERNAME_TEST} --password-stdin ; fi
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
+  - if [ "$GITHUB_TOKEN" != "" ] ; then composer global config github-oauth.github.com $GITHUB_TOKEN ; fi
   - bin/.travis/update_docker.sh
   - bin/.travis/build.sh ${PHP_VERSION} ${NODE_VERSION}
 script: bin/.travis/test.sh

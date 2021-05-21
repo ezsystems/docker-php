@@ -31,9 +31,9 @@ if [ "$FORMAT_VERSION" = "" ]; then
     FORMAT_VERSION="v2"
 fi
 
-if [ "$EZ_VERSION" = "" ]; then
+if [ "$PRODUCT_VERSION" = "" ]; then
     # pull in latest stable by default
-    EZ_VERSION="^3.0@dev"
+    PRODUCT_VERSION="~3.3.0"
 fi
 
 if [ "$REUSE_VOLUME" = "0" ]; then
@@ -47,10 +47,18 @@ if [ "$REUSE_VOLUME" = "0" ]; then
     fi
 
     printf "\nBuilding on ez_php:latest, composer will implicit check requirements\n"
-    if [ "$UPDATE_PACKAGES" = "1" ]; then
-        printf "\nAs requested will also force update packages after create-project\n"
+    if [ "$PRODUCT_VERSION" = "^2.5" ]; then
         docker run -ti --rm \
           -e SYMFONY_ENV \
+          -e PHP_INI_ENV_memory_limit=3G \
+          -v $(pwd)/volumes/ezplatform:/var/www \
+          -v  $COMPOSER_HOME:/root/.composer \
+          ez_php:latest-node \
+          bash -c "
+          composer --version &&
+          composer create-project --no-progress --no-interaction ezsystems/ezplatform /var/www $PRODUCT_VERSION"
+    elif [ "$PRODUCT_VERSION" = "~3.3.0" ]; then
+        docker run -ti --rm \
           -e APP_ENV \
           -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
@@ -58,19 +66,11 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           ez_php:latest-node \
           bash -c "
           composer --version &&
-          composer create-project --prefer-dist --no-progress --no-interaction --no-scripts ezsystems/ezplatform /var/www $EZ_VERSION &&
-          composer update --prefer-dist --no-progress --no-interaction --with-all-dependencies"
-    else
-        docker run -ti --rm \
-          -e SYMFONY_ENV \
-          -e APP_ENV \
-          -e PHP_INI_ENV_memory_limit=3G \
-          -v $(pwd)/volumes/ezplatform:/var/www \
-          -v  $COMPOSER_HOME:/root/.composer \
-          ez_php:latest-node \
-          bash -c "
-          composer --version &&
-          composer create-project --prefer-dist --no-progress --no-interaction ezsystems/ezplatform /var/www $EZ_VERSION"
+          composer create-project --no-progress --no-interaction ibexa/oss-skeleton /var/www $PRODUCT_VERSION --no-install &&
+          composer require --prefer-dist ibexa/docker --no-install --no-scripts &&
+          composer install &&
+          composer require ezsystems/behatbundle --no-scripts
+          composer recipes:install ezsystems/behatbundle --force"
     fi
 fi
 
@@ -88,15 +88,28 @@ printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-node with
 cd volumes/ezplatform
 
 export COMPOSE_FILE="doc/docker/base-dev.yml:doc/docker/redis.yml:doc/docker/selenium.yml" 
-export SYMFONY_ENV="behat" SYMFONY_DEBUG="0" APP_ENV="behat" APP_DEBUG="0" 
+export SYMFONY_ENV="behat" SYMFONY_DEBUG="1" 
+export APP_ENV="behat" APP_DEBUG="1" 
 export PHP_IMAGE="ez_php:latest-node" PHP_IMAGE_DEV="ez_php:latest-node"
 
-docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
+if [ "$PRODUCT_VERSION" = "^2.5" ]; then
+    docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
+    docker-compose up -d --build --force-recreate
+    echo '> Workaround for test issues: Change ownership of files inside docker container'
+    docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
+elif [ "$PRODUCT_VERSION" = "~3.3.0" ]; then
+    docker-compose up -d --build --force-recreate
+    echo '> Workaround for test issues: Change ownership of files inside docker container'
+    docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
+    # Rebuild Symfony container
+    docker-compose exec --user www-data app sh -c "rm -rf var/cache/*"
+    docker-compose exec --user www-data app php bin/console cache:clear
+    # Install database & generate schema
+    docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console ibexa:install"
+    docker-compose exec --user www-data app sh -c "php bin/console ibexa:graphql:generate-schema"
+    docker-compose exec --user www-data app sh -c "composer run post-install-cmd"
+fi
 
-docker-compose up -d --build --force-recreate
-echo '> Workaround for test issues: Change ownership of files inside docker container'
-docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
-
-docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; php bin/behat -v --profile=adminui --suite=richtext"
+docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; $TEST_CMD"
 
 docker-compose down -v
