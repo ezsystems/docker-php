@@ -38,7 +38,7 @@ NODE_VERSION=`docker -l error run ez_php:latest-node node -e "console.log(proces
 NODE_VERSION=`echo $NODE_VERSION | cut -f 1 -d "."`
 
 docker images
-docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
 
 ## TAGS
 echo "About to tag remote image '${REMOTE_IMAGE}' with php version '${PHP_VERSION}' and Node '${NODE_VERSION}'"
