@@ -69,7 +69,8 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           composer create-project --no-progress --no-interaction ibexa/oss-skeleton /var/www $PRODUCT_VERSION --no-install &&
           composer require --prefer-dist ibexa/docker --no-install --no-scripts &&
           composer install &&
-          composer require ezsystems/behatbundle --no-scripts --no-plugins &&
+          composer require --dev phpunit/phpunit:^8.0 -W --no-scripts &&
+          composer require ezsystems/behatbundle:v8.3.0 --no-scripts --no-plugins &&
           composer recipes:install ezsystems/behatbundle --force"
     fi
 fi
