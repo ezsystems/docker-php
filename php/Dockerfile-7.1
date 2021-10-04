@@ -16,7 +16,11 @@ RUN apt-get update -q -y \
         curl \
         acl \
         sudo \
+# Remove expired Let's Encrypt certificate
+    && rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt \
+    && update-ca-certificates \
 # Needed for the php extensions we enable below
+    && apt-get install -q -y --no-install-recommends \
         libfreetype6 \
         libjpeg62-turbo \
         libxpm4 \
