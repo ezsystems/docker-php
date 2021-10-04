@@ -66,11 +66,9 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           ez_php:latest-node \
           bash -c "
           composer --version &&
-          composer create-project --no-progress --no-interaction ibexa/oss-skeleton /var/www $PRODUCT_VERSION --no-install &&
-          composer require --prefer-dist ibexa/docker --no-install --no-scripts &&
-          composer install &&
-          composer require --dev phpunit/phpunit:^8.0 -W --no-scripts &&
-          composer require ezsystems/behatbundle:v8.3.0 --no-scripts --no-plugins &&
+          composer create-project --no-progress --no-interaction ibexa/oss-skeleton /var/www $PRODUCT_VERSION &&
+          composer require ibexa/docker &&
+          composer require ezsystems/behatbundle:^8.3 --no-scripts --no-plugins &&
           composer recipes:install ezsystems/behatbundle --force"
     fi
 fi
@@ -94,12 +92,12 @@ export APP_ENV="behat" APP_DEBUG="1"
 export PHP_IMAGE="ez_php:latest-node" PHP_IMAGE_DEV="ez_php:latest-node"
 
 if [ "$PRODUCT_VERSION" = "^2.5" ]; then
-    docker-compose -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
-    docker-compose up -d --build --force-recreate
+    docker-compose --env-file .env -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
+    docker-compose --env-file .env up -d --build --force-recreate
     echo '> Workaround for test issues: Change ownership of files inside docker container'
     docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
 elif [ "$PRODUCT_VERSION" = "~3.3.0" ]; then
-    docker-compose up -d --build --force-recreate
+    docker-compose --env-file .env up -d --build --force-recreate
     echo '> Workaround for test issues: Change ownership of files inside docker container'
     docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
     # Rebuild Symfony container
@@ -113,4 +111,4 @@ fi
 
 docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; $TEST_CMD"
 
-docker-compose down -v
+docker-compose --env-file .env down -v

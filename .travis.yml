@@ -1,7 +1,7 @@
-sudo: required
-dist: trusty
-
-language: generic
+dist: focal
+language: php
+php:
+  - 7.4
 
 services:
   - docker
@@ -24,15 +24,15 @@ env:
     - PHP_VERSION="7.2" NODE_VERSION="10" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
     - PHP_VERSION="7.2" NODE_VERSION="12" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
     - PHP_VERSION="7.2" NODE_VERSION="14" PRODUCT_VERSION="^2.5" TEST_CMD="bin/behat -v --profile=adminui --suite=richtext"
-    - PHP_VERSION="7.3" NODE_VERSION="10" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
-    - PHP_VERSION="7.3" NODE_VERSION="12" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
-    - PHP_VERSION="7.3" NODE_VERSION="14" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
-    - PHP_VERSION="7.4" NODE_VERSION="10" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
-    - PHP_VERSION="7.4" NODE_VERSION="12" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
-    - PHP_VERSION="7.4" NODE_VERSION="14" TEST_CMD="vendor/bin/behat -v --profile=adminui --suite=richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.3" NODE_VERSION="10" TEST_CMD="vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.3" NODE_VERSION="12" TEST_CMD="vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.3" NODE_VERSION="14" TEST_CMD="vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.4" NODE_VERSION="10" TEST_CMD="vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.4" NODE_VERSION="12" TEST_CMD="vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
+    - PHP_VERSION="7.4" NODE_VERSION="14" TEST_CMD="vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
 
 before_script:
-  - if [ ! -d ~/.composer/ ] ; then mkdir ~/.composer/; fi
+  - export COMPOSER_HOME=$(composer config --global home)
   - if [[ -n "${DOCKER_PASSWORD_TEST}" ]]; then echo ${DOCKER_PASSWORD_TEST} | docker login -u ${DOCKER_USERNAME_TEST} --password-stdin ; fi
   - echo "{\"github-oauth\":{\"github.com\":\"d0285ed5c8644f30547572ead2ed897431c1fc09\"}}" > ~/.composer/auth.json
   - if [ "$GITHUB_TOKEN" != "" ] ; then composer global config github-oauth.github.com $GITHUB_TOKEN ; fi
