@@ -16,9 +16,9 @@ RUN apt-get update -q -y \
         curl \
         acl \
         sudo \
-# Remove expired Let's Encrypt certificate
-    && rm /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt \
-    && update-ca-certificates \
+# Add expired Let's Encrypt certificate to the blacklist
+    && cp /usr/share/ca-certificates/mozilla/DST_Root_CA_X3.crt /etc/pki/ca-trust/source/blacklist \
+    && update-ca-trust \
 # Needed for the php extensions we enable below
     && apt-get install -q -y --no-install-recommends \
         libfreetype6 \
