@@ -61,4 +61,4 @@ if [ "$LATEST_PHP" = "$PHP_VERSION" ]; then
 fi
 
 echo "Pushing docker image with all tags : ${REMOTE_IMAGE}"
-docker push "${REMOTE_IMAGE}"
+docker push --all-tags "${REMOTE_IMAGE}"
