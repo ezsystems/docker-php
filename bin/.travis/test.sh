@@ -19,26 +19,14 @@ case $i in
 esac
 done
 
-if [ "$APP_ENV" = "" ]; then
-    APP_ENV="prod"
-fi
-
-if [ "$SYMFONY_ENV" = "" ]; then
-    SYMFONY_ENV="prod"
-fi
-
-if [ "$FORMAT_VERSION" = "" ]; then
-    FORMAT_VERSION="v2"
-fi
-
-if [ "$PRODUCT_VERSION" = "" ]; then
-    # pull in latest stable by default
-    PRODUCT_VERSION="~3.3.0"
-fi
+APP_ENV=${APP_ENV:-prod}
+SYMFONY_ENV=${SYMFONY_ENV:-prod}
+PRODUCT_VERSION=${PRODUCT_VERSION:-^3.3.x-dev}
+FORMAT_VERSION=${FORMAT_VERSION:-v2}
 
 if [ "$REUSE_VOLUME" = "0" ]; then
     printf "\n(Re-)Creating volumes/ezplatform for fresh checkout, needs sudo to delete old and chmod new folder\n"
-    sudo rm -Rf volumes/ezplatform
+    rm -Rf volumes/ezplatform
     # Use mode here so this can be run on Mac
     mkdir -pm 0777 volumes/ezplatform
 
@@ -57,7 +45,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           bash -c "
           composer --version &&
           composer create-project --no-progress --no-interaction ezsystems/ezplatform /var/www $PRODUCT_VERSION"
-    elif [ "$PRODUCT_VERSION" = "~3.3.0" ]; then
+    elif [ "$PRODUCT_VERSION" = "^3.3.x-dev" ]; then
         docker run -ti --rm \
           -e APP_ENV \
           -e PHP_INI_ENV_memory_limit=3G \
@@ -66,9 +54,12 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           ez_php:latest-node \
           bash -c "
           composer --version &&
-          composer create-project --no-progress --no-interaction ibexa/oss-skeleton /var/www $PRODUCT_VERSION &&
-          composer require ibexa/docker &&
-          composer require ezsystems/behatbundle:^8.3 --no-scripts --no-plugins &&
+          composer create-project --no-progress --no-interaction $COMPOSER_OPTIONS ibexa/website-skeleton /var/www $PRODUCT_VERSION &&
+          composer require ibexa/oss:$PRODUCT_VERSION -W  --no-scripts $COMPOSER_OPTIONS
+          git init && git add . && git commit -m 'Init'
+          composer recipes:install ibexa/oss --force -v
+          composer require ibexa/docker $COMPOSER_OPTIONS &&
+          composer require ezsystems/behatbundle:^8.3.x-dev --no-scripts --no-plugins $COMPOSER_OPTIONS &&
           composer recipes:install ezsystems/behatbundle --force"
     fi
 fi
@@ -95,20 +86,20 @@ if [ "$PRODUCT_VERSION" = "^2.5" ]; then
     docker-compose --env-file .env -f doc/docker/install-dependencies.yml -f doc/docker/install-database.yml up --abort-on-container-exit
     docker-compose --env-file .env up -d --build --force-recreate
     echo '> Workaround for test issues: Change ownership of files inside docker container'
-    docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
-elif [ "$PRODUCT_VERSION" = "~3.3.0" ]; then
+    docker-compose --env-file=.env exec app sh -c 'chown -R www-data:www-data /var/www'
+elif [ "$PRODUCT_VERSION" = "^3.3.x-dev" ]; then
     docker-compose --env-file .env up -d --build --force-recreate
     echo '> Workaround for test issues: Change ownership of files inside docker container'
-    docker-compose exec app sh -c 'chown -R www-data:www-data /var/www'
+    docker-compose --env-file=.env exec app sh -c 'chown -R www-data:www-data /var/www'
     # Rebuild Symfony container
-    docker-compose exec --user www-data app sh -c "rm -rf var/cache/*"
-    docker-compose exec --user www-data app php bin/console cache:clear
+    docker-compose --env-file=.env exec --user www-data app sh -c "rm -rf var/cache/*"
+    docker-compose --env-file=.env exec --user www-data app php bin/console cache:clear
     # Install database & generate schema
-    docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console ibexa:install"
-    docker-compose exec --user www-data app sh -c "php bin/console ibexa:graphql:generate-schema"
-    docker-compose exec --user www-data app sh -c "composer run post-install-cmd"
+    docker-compose --env-file=.env exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console ibexa:install"
+    docker-compose --env-file=.env exec --user www-data app sh -c "php bin/console ibexa:graphql:generate-schema"
+    docker-compose --env-file=.env exec --user www-data app sh -c "composer run post-install-cmd"
 fi
 
-docker-compose exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; $TEST_CMD"
+docker-compose --env-file=.env exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; $TEST_CMD"
 
 docker-compose --env-file .env down -v
