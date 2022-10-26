@@ -32,3 +32,6 @@ jobs:
               run: bin/.travis/test.sh
               env:
                 TEST_CMD: "vendor/bin/behat -v --profile=browser --suite=admin-ui --tags=@richtext --config=behat_ibexa_oss.yaml"
+            - name: Push image
+              if: github.ref_name == 'master' || github.ref_name == 'v1'
+              run: bin/.travis/push.sh ezsystems/php v2
