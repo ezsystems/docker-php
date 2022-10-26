@@ -57,7 +57,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           composer create-project --no-progress --no-interaction $COMPOSER_OPTIONS ibexa/website-skeleton /var/www $PRODUCT_VERSION &&
           composer require ibexa/oss:$PRODUCT_VERSION -W  --no-scripts $COMPOSER_OPTIONS
           git init && git add . && git commit -m 'Init'
-          composer recipes:install ibexa/oss --force -v
+          composer recipes:install ibexa/oss --force --reset -v
           composer require ibexa/docker $COMPOSER_OPTIONS &&
           composer require ezsystems/behatbundle:^8.3.x-dev --no-scripts --no-plugins $COMPOSER_OPTIONS &&
           composer recipes:install ezsystems/behatbundle --force"
