@@ -15,12 +15,12 @@ jobs:
             matrix:
                 php:
                     - "7.3"
-                    - "7.4"
-                    - "8.0"
+                    # - "7.4"
+                    # - "8.0"
                     - "8.1"
                 node:
                     - "12"
-                    - "14"
+                    # - "14"
 
         steps:
             - uses: actions/checkout@v2
