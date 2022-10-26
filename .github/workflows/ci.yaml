@@ -1,0 +1,32 @@
+
+name: Build and test Docker images
+on:
+    push:
+        branches:
+            - master
+            - "[0-9]+.[0-9]+"
+    pull_request: ~
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                php:
+                    - "7.3"
+                    - "7.4"
+                    - "8.0"
+                    - "8.1"
+                node:
+                    - "12"
+                    - "14"
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Set Docker version
+              run: bin/.travis/update_docker.sh
+            - name: Build image
+              run: bin/.travis/build.sh ${{ matrix.php }} ${{ matrix.node }}
+            - name: Test image
+              run: bin/.travis/test.sh
