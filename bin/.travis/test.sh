@@ -36,7 +36,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
 
     printf "\nBuilding on ez_php:latest, composer will implicit check requirements\n"
     if [ "$PRODUCT_VERSION" = "^2.5" ]; then
-        docker run -ti --rm \
+        docker run -i --rm \
           -e SYMFONY_ENV \
           -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
@@ -46,7 +46,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
           composer --version &&
           composer create-project --no-progress --no-interaction ezsystems/ezplatform /var/www $PRODUCT_VERSION"
     elif [ "$PRODUCT_VERSION" = "^3.3.x-dev" ]; then
-        docker run -ti --rm \
+        docker run -i --rm \
           -e APP_ENV \
           -e PHP_INI_ENV_memory_limit=3G \
           -v $(pwd)/volumes/ezplatform:/var/www \
@@ -69,10 +69,10 @@ docker -l error run -a stderr ez_php:latest-node node -e "process.versions.node"
 docker -l error run -a stderr ez_php:latest-node bash -c "yarn -v"
 
 printf "\nVersion and module information about php build\n"
-docker run -ti --rm ez_php:latest-node bash -c "php -v; php -m"
+docker run -i --rm ez_php:latest-node bash -c "php -v; php -m"
 
 printf "\nVersion and module information about php build with enabled xdebug\n"
-docker run -ti --rm -e ENABLE_XDEBUG="1" ez_php:latest-node bash -c "php -v; php -m"
+docker run -i --rm -e ENABLE_XDEBUG="1" ez_php:latest-node bash -c "php -v; php -m"
 
 printf "\Integration: Behat testing on ez_php:latest and ez_php:latest-node with eZ Platform\n"
 cd volumes/ezplatform
@@ -90,16 +90,16 @@ if [ "$PRODUCT_VERSION" = "^2.5" ]; then
 elif [ "$PRODUCT_VERSION" = "^3.3.x-dev" ]; then
     docker-compose --env-file .env up -d --build --force-recreate
     echo '> Workaround for test issues: Change ownership of files inside docker container'
-    docker-compose --env-file=.env exec app sh -c 'chown -R www-data:www-data /var/www'
+    docker-compose --env-file=.env exec -T app sh -c 'chown -R www-data:www-data /var/www'
     # Rebuild Symfony container
-    docker-compose --env-file=.env exec --user www-data app sh -c "rm -rf var/cache/*"
-    docker-compose --env-file=.env exec --user www-data app php bin/console cache:clear
+    docker-compose --env-file=.env exec -T --user www-data app sh -c "rm -rf var/cache/*"
+    docker-compose --env-file=.env exec -T --user www-data app php bin/console cache:clear
     # Install database & generate schema
-    docker-compose --env-file=.env exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console ibexa:install"
-    docker-compose --env-file=.env exec --user www-data app sh -c "php bin/console ibexa:graphql:generate-schema"
-    docker-compose --env-file=.env exec --user www-data app sh -c "composer run post-install-cmd"
+    docker-compose --env-file=.env exec -T --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console ibexa:install"
+    docker-compose --env-file=.env exec -T --user www-data app sh -c "php bin/console ibexa:graphql:generate-schema"
+    docker-compose --env-file=.env exec -T --user www-data app sh -c "composer run post-install-cmd"
 fi
 
-docker-compose --env-file=.env exec --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; $TEST_CMD"
+docker-compose --env-file=.env exec -T --user www-data app sh -c "php /scripts/wait_for_db.php; php bin/console cache:warmup; $TEST_CMD"
 
 docker-compose --env-file .env down -v
