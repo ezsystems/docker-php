@@ -1,4 +1,4 @@
-FROM php:7.3-fpm-bullseye
+FROM php:7.3-fpm-stretch
 
 # Container containing php-fpm and php-cli to run and interact with eZ Platform and other Symfony projects
 #
@@ -10,7 +10,8 @@ FROM php:7.3-fpm-bullseye
 ENV COMPOSER_HOME=/root/.composer
 
 # Get packages that we need in container
-RUN apt-get update -q -y \
+RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list \
+    && apt-get update -q -y \
     && apt-get install -q -y --no-install-recommends \
         ca-certificates \
         curl \
