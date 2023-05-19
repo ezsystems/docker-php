@@ -46,8 +46,7 @@ if [ "$REUSE_VOLUME" = "0" ]; then
         git init && git add . && git commit -m 'Init'
         composer recipes:install ibexa/oss --force --reset -v
         composer require ibexa/docker:$PRODUCT_VERSION $COMPOSER_OPTIONS &&
-        composer require ezsystems/behatbundle:^8.3.x-dev -W --no-scripts --no-plugins $COMPOSER_OPTIONS &&
-        composer recipes:install ezsystems/behatbundle --force --no-scripts &&
+        composer require ezsystems/behatbundle:^8.3.x-dev -W --no-scripts $COMPOSER_OPTIONS &&
         sudo sed -i \"s/\['test' => true\]/\['test' => true, 'behat' => true\]/g\" config/bundles.php"
 fi
 
