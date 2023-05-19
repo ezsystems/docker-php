@@ -45,9 +45,10 @@ if [ "$REUSE_VOLUME" = "0" ]; then
         composer require ibexa/oss:$PRODUCT_VERSION -W  --no-scripts $COMPOSER_OPTIONS
         git init && git add . && git commit -m 'Init'
         composer recipes:install ibexa/oss --force --reset -v
-        composer require ibexa/docker $COMPOSER_OPTIONS &&
-        composer require ezsystems/behatbundle:^8.3.x-dev --no-scripts --no-plugins $COMPOSER_OPTIONS &&
-        composer recipes:install ezsystems/behatbundle --force"
+        composer require ibexa/docker:$PRODUCT_VERSION $COMPOSER_OPTIONS &&
+        composer require ezsystems/behatbundle:^8.3.x-dev -W --no-scripts --no-plugins $COMPOSER_OPTIONS &&
+        composer recipes:install ezsystems/behatbundle --force --no-scripts &&
+        sudo sed -i \"s/\['test' => true\]/\['test' => true, 'behat' => true\]/g\" config/bundles.php"
 fi
 
 printf "\nMake sure Node.js and Yarn are included in latest-node\n"
